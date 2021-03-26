@@ -10,7 +10,6 @@
 		3CF45F22260E4DA100FE949E /* PathMapperApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CF45F21260E4DA100FE949E /* PathMapperApp.swift */; };
 		3CF45F24260E4DA100FE949E /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CF45F23260E4DA100FE949E /* ContentView.swift */; };
 		3CF45F26260E4DA200FE949E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3CF45F25260E4DA200FE949E /* Assets.xcassets */; };
-		3CF45F29260E4DA200FE949E /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3CF45F28260E4DA200FE949E /* Preview Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -18,7 +17,6 @@
 		3CF45F21260E4DA100FE949E /* PathMapperApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PathMapperApp.swift; sourceTree = "<group>"; };
 		3CF45F23260E4DA100FE949E /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		3CF45F25260E4DA200FE949E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		3CF45F28260E4DA200FE949E /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		3CF45F2A260E4DA200FE949E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -56,17 +54,8 @@
 				3CF45F23260E4DA100FE949E /* ContentView.swift */,
 				3CF45F25260E4DA200FE949E /* Assets.xcassets */,
 				3CF45F2A260E4DA200FE949E /* Info.plist */,
-				3CF45F27260E4DA200FE949E /* Preview Content */,
 			);
 			path = PathMapper;
-			sourceTree = "<group>";
-		};
-		3CF45F27260E4DA200FE949E /* Preview Content */ = {
-			isa = PBXGroup;
-			children = (
-				3CF45F28260E4DA200FE949E /* Preview Assets.xcassets */,
-			);
-			path = "Preview Content";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -126,7 +115,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3CF45F29260E4DA200FE949E /* Preview Assets.xcassets in Resources */,
 				3CF45F26260E4DA200FE949E /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -268,7 +256,6 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_ASSET_PATHS = "\"PathMapper/Preview Content\"";
 				DEVELOPMENT_TEAM = YA533DMD5J;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = PathMapper/Info.plist;
@@ -290,7 +277,6 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_ASSET_PATHS = "\"PathMapper/Preview Content\"";
 				DEVELOPMENT_TEAM = YA533DMD5J;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = PathMapper/Info.plist;
