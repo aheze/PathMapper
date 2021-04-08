@@ -35,7 +35,7 @@ struct ContentView: View {
         CGPoint(x: 225, y: 190),
         CGPoint(x: 370, y: 190),
         CGPoint(x: 30, y: 350),
-        CGPoint(x: 225, y: 350),
+        CGPoint(x: 225, y: 350), /// you are here
         CGPoint(x: 370, y: 350)
     ]
     
