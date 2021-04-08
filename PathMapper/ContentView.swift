@@ -14,11 +14,18 @@ struct ContentView: View {
         var end: CGPoint
         let weight: CGFloat
         
-        init(start: CGPoint, end: CGPoint) {
+        init(start: CGPoint, end: CGPoint, weight: CGFloat? = nil) {
             self.start = start
             self.end = end
-            self.weight = CGPointDistanceSquared(from: start, to: end)
+            
+            if let weight = weight { /// if weight is provided, then set
+                self.weight = weight
+            } else { /// calculate weight if not provided
+                self.weight = CGPointDistanceSquared(from: start, to: end)
+            }
         }
+        
+        
     }
     class Vertex: Equatable {
         var point: CGPoint
@@ -199,69 +206,51 @@ struct ContentView: View {
         if let classroomHallwayIndex = hallways.firstIndex(where: { CGPointIsOnLine(lineStart: $0.start, lineEnd: $0.end, pointToCheck: classroom.entrancePoints.first!) }) {
             let hallway = hallways[classroomHallwayIndex]
             
+            print("Hallway start: \(hallway.start), classroom: \(classroom.entrancePoints.first!)")
             let newHallway = DirectionalHallway(start: hallway.start, end: classroom.entrancePoints.first!)
-            let endHallway = DirectionalHallway(start: classroom.entrancePoints.first!, end: .zero)
+            let endHallway = DirectionalHallway(start: classroom.entrancePoints.first!, end: .zero, weight: 0)
             
-//            let endingVertex = vertexAt(point: newHallway.end)
-//            print("vertic now \(vertices.map { $0.point })")
-//            endingVertex.touchingHallways.append(newHallway)
-//            vertices.append(endingVertex)
+            print("new wright: \(newHallway.weight)")
+            print("End weight: \(endHallway.weight)")
             
             hallways.remove(at: classroomHallwayIndex)
             hallways.append(newHallway)
             hallways.append(endHallway)
-            
-            print("TO VERTEX: \(newHallway.end)")
         }
         
-        
-//
-//        for edgeDescription in edgeList {
-//                    let fromNode = node(identifier: edgeDescription[0])
-//                    let toNode = node(identifier: edgeDescription[1])
-//                    let edge = Edge(to: toNode, from: fromNode, weight: edgeDescription[2])
-//                    fromNode.edges.append(edge)
-//                }
         for hallway in hallways {
-//            let vertex = Vertex(point: hallway.start)
             let vertex = vertexAt(point: hallway.start)
             vertex.touchingHallways.append(hallway)
-//            vertices.append(vertex)
         }
         
-        print("vertic now \(vertices.map { $0.point })")
         
         func distance(from: CGPoint, to: CGPoint) -> CGFloat? {
-            print("to. \(to)")
             
             guard let fromVertex = vertices.first(where: { $0.point == from }) else {
-                print("no from")
                 return nil
             }
             guard let toVertex = vertices.first(where: { $0.point == to }) else {
-                print("no to")
                 return nil
             }
             
             for vertex in vertices {
                 vertex.visited = false
                 vertex.distance = CGFloat.infinity
-                print("Touching at vert \(vertex.point).. \(vertex.touchingHallways.count)")
+//                print("Touching at vert \(vertex.point).. \(vertex.touchingHallways.count)")
             }
             
             fromVertex.distance = 0
             var verticesToVisit: [Vertex] = [fromVertex]
             
             while !verticesToVisit.isEmpty {
-                print("current vertices: \(verticesToVisit.map {$0.point })")
+                print("---- current vertices to visit: \(verticesToVisit.map {$0.point })")
                 
                 // Select node with smallest distance.
                 let currentVisitingVertex = verticesToVisit.min(by: { (a, b) -> Bool in
                     return a.distance < b.distance
                 })!
                 
-                print("curr \(currentVisitingVertex.point)")
-                print("to.........: \(toVertex.point)")
+                print("Current point \(currentVisitingVertex.point)")
                 
                 // Destination reached?
                 if currentVisitingVertex == toVertex { return currentVisitingVertex.distance }
@@ -276,17 +265,19 @@ struct ContentView: View {
                 
                 // Update unvisited neighbors.
                 for touchingHallway in currentVisitingVertex.touchingHallways {
-                    print("touchig end./. \(touchingHallway.end)")
+                    print("Touching end: \(touchingHallway.end)")
                     let endVertex = vertexAt(point: touchingHallway.end)
                     if endVertex.visited == false {
                         verticesToVisit.append(endVertex)
                         
-                        print("cr.. \(currentVisitingVertex.distance) wei \(touchingHallway.weight)")
+                        print("Current visiting vertex distance \(currentVisitingVertex.distance). Weight of touching hallway \(touchingHallway.weight) ... end \(touchingHallway.end)")
                         
                         let totalDistance = currentVisitingVertex.distance + touchingHallway.weight
                         if totalDistance < endVertex.distance {
                             endVertex.distance = totalDistance
                         }
+                    } else {
+                        print("Visited already")
                     }
                 }
             }
@@ -306,6 +297,7 @@ struct ContentView: View {
         } else {
             print("Nope")
         }
+        print("!    done")
     }
     
     
@@ -321,7 +313,29 @@ func CGPointIsOnLine(lineStart: CGPoint, lineEnd: CGPoint, pointToCheck: CGPoint
     let xAreSame = pointToCheck.x == lineStart.x && pointToCheck.x == lineEnd.x
     let yAreSame = pointToCheck.y == lineStart.y && pointToCheck.y == lineEnd.y
     
-    return xAreSame || yAreSame /// as long as one is same, then return true
+    if xAreSame {
+        /// ignore direction
+        let maxY = max(lineStart.y, lineEnd.y)
+        let minY = min(lineStart.y, lineEnd.y)
+        
+        print("X Same. Comparing Y bounds: min \(minY) point \(pointToCheck.x) max \(maxY)")
+        
+        if pointToCheck.y <= maxY && pointToCheck.y >= minY {
+            return true
+        }
+    } else if yAreSame {
+        /// ignore direction
+        let maxX = max(lineStart.x, lineEnd.x)
+        let minX = min(lineStart.x, lineEnd.x)
+        
+        print("Y Same. Comparing Y bounds: min \(minX) point \(pointToCheck.x) max \(maxX)")
+        
+        if pointToCheck.x <= maxX && pointToCheck.x >= minX {
+            return true
+        }
+    }
+    
+    return false
 }
 
 struct ContentView_Previews: PreviewProvider {
