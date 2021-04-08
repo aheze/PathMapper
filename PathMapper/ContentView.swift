@@ -119,6 +119,16 @@ struct ContentView: View {
     
     var body: some View {
         VStack {
+            
+            Text("PathMapper")
+                .font(.system(size: 32, weight: .bold, design: .rounded))
+                .padding(EdgeInsets(top: 12, leading: 12, bottom: 3, trailing: 12))
+            
+            Text("Find the shortest route to a classroom")
+                .fontWeight(.medium)
+                .padding(EdgeInsets(top: 0, leading: 12, bottom: 6, trailing: 12))
+            
+            
             ZStack {
                 Color(.secondarySystemBackground)
                     .frame(width: 400, height: 400)
@@ -131,26 +141,26 @@ struct ContentView: View {
                 
                 MapView()
             }
-            
-            Text("Where do you want to go?")
-                .fontWeight(.medium)
-                .padding()
+            .padding(.vertical, 10)
             
             
-            HStack {
+            VStack {
                 Picker(selectedClassroom.name, selection: $selectedClassroom) {
                     ForEach(classrooms, id: \.self) { classroom in
                         Text(classroom.name)
                     }
                 }
                 .pickerStyle(MenuPickerStyle())
-                .padding(.trailing, 20)
+                .font(.system(size: 24, weight: .medium))
+                .foregroundColor(.blue)
+                .padding(.vertical, 6)
                 
                 
                 Button(action: {
                     calculateSelection()
                 }) {
                     Text("Calculate")
+                        .font(.system(size: 21, weight: .medium))
                         .foregroundColor(Color.white)
                         .padding()
                         .background(Color.green)
