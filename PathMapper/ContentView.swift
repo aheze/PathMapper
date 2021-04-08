@@ -9,7 +9,22 @@ import SwiftUI
 
 struct ContentView: View {
     
-    /// hallway interesections
+    struct DirectionalHallway {
+        var start: CGPoint
+        var end: CGPoint
+    }
+    
+    struct Classroom {
+        var name: String
+        var hallwayPoint: CGPoint
+    }
+    
+    struct MultiEntranceClassroom {
+        var name: String
+        var hallwayPoints: [CGPoint]
+    }
+    
+    /// hallway intersections
     let intersections: [CGPoint] = [
         CGPoint(x: 30, y: 50),
         CGPoint(x: 370, y: 50),
@@ -26,25 +41,6 @@ struct ContentView: View {
         CGPoint(x: 225, y: 350),
         CGPoint(x: 370, y: 350)
     ]
-    
-    struct DirectionalHallway {
-        var start: CGPoint
-        var end: CGPoint
-    }
-    
-    struct Classroom {
-        var name: String
-        var buildingFrame: CGRect
-        var doorFrame: CGRect
-        var hallwayPoint: CGPoint
-    }
-    
-    struct MultiEntranceClassroom {
-        var name: String
-        var buildingFrame: CGRect
-        var doorFrames: [CGRect]
-        var hallwayPoints: [CGPoint]
-    }
     
     let hallways: [DirectionalHallway] = [
         
@@ -73,12 +69,22 @@ struct ContentView: View {
         DirectionalHallway( start: CGPoint(x: 370, y: 190), end: CGPoint(x: 370, y: 350) )
     ]
     
+    let buildings: [Any] = [
+        Classroom(name: "101", hallwayPoint: CGPoint(x: 40, y: 40))
+    ]
+    
     var body: some View {
         ZStack {
-            Text("Hello, world!")
-                .background(Color.blue)
-                .position(x: 100, y: 100)
+            Color(.secondarySystemBackground)
+                .frame(width: 400, height: 400)
             
+            Image("Hallways")
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(width: 400, height: 400)
+            
+            
+                MapView()
         }
     }
 }
