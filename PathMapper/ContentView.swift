@@ -9,80 +9,29 @@ import SwiftUI
 
 struct ContentView: View {
     
-    class DirectionalHallway {
-        var start: CGPoint
-        var end: CGPoint
-        let weight: CGFloat
-        
-        init(start: CGPoint, end: CGPoint, weight: CGFloat? = nil) {
-            self.start = start
-            self.end = end
-            
-            if let weight = weight { /// if weight is provided, then set
-                self.weight = weight
-            } else { /// calculate weight if not provided
-                self.weight = CGPointDistanceSquared(from: start, to: end)
-            }
-        }
-        
-        
-    }
-    class Vertex: Equatable {
-        var point: CGPoint
-        var distance = CGFloat.infinity
-        var touchingHallways = [DirectionalHallway]()
-        var visited = false
-        
-        init(point: CGPoint) {
-            self.point = point
-        }
-        
-        static func == (lhs: Vertex, rhs: Vertex) -> Bool {
-            return lhs === rhs
-        }
-        
-    }
-    struct Classroom: Identifiable, Hashable {
-        let id = UUID()
-        
-        var name: String
-        var entrancePoints: [CGPoint]
-        
-        func hash(into hasher: inout Hasher) {
-            hasher.combine(id)
-        }
-        static func ==(lhs: Classroom, rhs: Classroom) -> Bool {
-            return lhs.id == rhs.id
-        }
-    }
-    
+    // MARK: - Static information
     var youAreHere = Vertex(point: CGPoint(x: 225, y: 350))
     
     let hallways: [DirectionalHallway] = [
         
         /// horizontal hallways
-        DirectionalHallway( start: CGPoint(x: 30, y: 50), end: CGPoint(x: 370, y: 50) ),
-        
-        DirectionalHallway( start: CGPoint(x: 370, y: 120), end: CGPoint(x: 225, y: 120) ),
-        DirectionalHallway( start: CGPoint(x: 225, y: 120), end: CGPoint(x: 30, y: 120) ),
-        
-        DirectionalHallway( start: CGPoint(x: 30, y: 190), end: CGPoint(x: 225, y: 190) ),
-        DirectionalHallway( start: CGPoint(x: 225, y: 190), end: CGPoint(x: 370, y: 190) ),
-        
-        DirectionalHallway( start: CGPoint(x: 370, y: 350), end: CGPoint(x: 225, y: 350) ),
-        DirectionalHallway( start: CGPoint(x: 225, y: 350), end: CGPoint(x: 30, y: 350) ),
+        DirectionalHallway(start: CGPoint(x: 30, y: 50), end: CGPoint(x: 370, y: 50)),
+        DirectionalHallway(start: CGPoint(x: 370, y: 120), end: CGPoint(x: 225, y: 120)),
+        DirectionalHallway(start: CGPoint(x: 225, y: 120), end: CGPoint(x: 30, y: 120)),
+        DirectionalHallway(start: CGPoint(x: 30, y: 190), end: CGPoint(x: 225, y: 190)),
+        DirectionalHallway(start: CGPoint(x: 225, y: 190), end: CGPoint(x: 370, y: 190)),
+        DirectionalHallway(start: CGPoint(x: 370, y: 350), end: CGPoint(x: 225, y: 350)),
+        DirectionalHallway(start: CGPoint(x: 225, y: 350), end: CGPoint(x: 30, y: 350)),
         
         /// vertical hallways
-        DirectionalHallway( start: CGPoint(x: 30, y: 120), end: CGPoint(x: 30, y: 50) ),
-        DirectionalHallway( start: CGPoint(x: 30, y: 190), end: CGPoint(x: 30, y: 120) ),
-        DirectionalHallway( start: CGPoint(x: 30, y: 350), end: CGPoint(x: 30, y: 190) ),
-        
-        DirectionalHallway( start: CGPoint(x: 225, y: 190), end: CGPoint(x: 225, y: 120) ),
-        DirectionalHallway( start: CGPoint(x: 225, y: 350), end: CGPoint(x: 225, y: 190) ),
-        
-        DirectionalHallway( start: CGPoint(x: 370, y: 50), end: CGPoint(x: 370, y: 120) ),
-        DirectionalHallway( start: CGPoint(x: 370, y: 120), end: CGPoint(x: 370, y: 190) ),
-        DirectionalHallway( start: CGPoint(x: 370, y: 190), end: CGPoint(x: 370, y: 350) )
+        DirectionalHallway(start: CGPoint(x: 30, y: 120), end: CGPoint(x: 30, y: 50)),
+        DirectionalHallway(start: CGPoint(x: 30, y: 190), end: CGPoint(x: 30, y: 120)),
+        DirectionalHallway(start: CGPoint(x: 30, y: 350), end: CGPoint(x: 30, y: 190)),
+        DirectionalHallway(start: CGPoint(x: 225, y: 190), end: CGPoint(x: 225, y: 120)),
+        DirectionalHallway(start: CGPoint(x: 225, y: 350), end: CGPoint(x: 225, y: 190)),
+        DirectionalHallway(start: CGPoint(x: 370, y: 50), end: CGPoint(x: 370, y: 120)),
+        DirectionalHallway(start: CGPoint(x: 370, y: 120), end: CGPoint(x: 370, y: 190)),
+        DirectionalHallway(start: CGPoint(x: 370, y: 190), end: CGPoint(x: 370, y: 350))
     ]
     
     let classrooms: [Classroom] = [
@@ -91,47 +40,31 @@ struct ContentView: View {
         Classroom(name: "103", entrancePoints: [CGPoint(x: 190, y: 350)]),
         Classroom(name: "104", entrancePoints: [CGPoint(x: 290, y: 350)]),
         Classroom(name: "105", entrancePoints: [CGPoint(x: 340, y: 350)]),
-        
         Classroom(name: "201", entrancePoints: [CGPoint(x: 90, y: 190)]),
         Classroom(name: "202", entrancePoints: [CGPoint(x: 140, y: 190)]),
         Classroom(name: "203", entrancePoints: [CGPoint(x: 190, y: 190)]),
         Classroom(name: "204", entrancePoints: [CGPoint(x: 290, y: 190)]),
         Classroom(name: "205", entrancePoints: [CGPoint(x: 340, y: 190)]),
-        
         Classroom(name: "301", entrancePoints: [CGPoint(x: 90, y: 120)]),
         Classroom(name: "302", entrancePoints: [CGPoint(x: 140, y: 120)]),
         Classroom(name: "303", entrancePoints: [CGPoint(x: 190, y: 120)]),
         Classroom(name: "304", entrancePoints: [CGPoint(x: 240, y: 120)]),
         Classroom(name: "305", entrancePoints: [CGPoint(x: 290, y: 120)]),
         Classroom(name: "306", entrancePoints: [CGPoint(x: 340, y: 120)]),
-        
         Classroom(name: "401", entrancePoints: [CGPoint(x: 90, y: 50)]),
         Classroom(name: "402", entrancePoints: [CGPoint(x: 140, y: 50)]),
         Classroom(name: "403", entrancePoints: [CGPoint(x: 190, y: 50)]),
         Classroom(name: "404", entrancePoints: [CGPoint(x: 240, y: 50)]),
         Classroom(name: "405", entrancePoints: [CGPoint(x: 290, y: 50)]),
         Classroom(name: "406", entrancePoints: [CGPoint(x: 340, y: 50)]),
-        
-        Classroom(
-            name: "GYM",
-            entrancePoints: [
-                CGPoint(x: 70, y: 190),
-                CGPoint(x: 225, y: 240),
-                CGPoint(x: 225, y: 300)
-            ]
-        ),
-        
-        Classroom(
-            name: "CAF",
-            entrancePoints: [
-                CGPoint(x: 225, y: 270),
-                CGPoint(x: 270, y: 230)
-            ]
-        )
+        Classroom(name: "GYM", entrancePoints: [CGPoint(x: 70, y: 190), CGPoint(x: 225, y: 240), CGPoint(x: 225, y: 300)]),
+        Classroom(name: "CAF", entrancePoints: [CGPoint(x: 225, y: 270), CGPoint(x: 270, y: 230)])
     ]
     
+    // MARK: - User input storage
     @State var selectedClassroom = Classroom(name: "Select a classroom", entrancePoints: [])
     
+    // MARK: - User interface
     var body: some View {
         VStack {
             
@@ -157,7 +90,6 @@ struct ContentView: View {
                 MapView()
             }
             .padding(.vertical, 10)
-            
             
             VStack {
                 Picker(selectedClassroom.name, selection: $selectedClassroom) {
@@ -186,6 +118,7 @@ struct ContentView: View {
         }
     }
     
+    // MARK: - Functions
     func calculateShortestPathTo(classroom: Classroom) {
         print("classroom: \(classroom)")
         
@@ -236,7 +169,6 @@ struct ContentView: View {
             for vertex in vertices {
                 vertex.visited = false
                 vertex.distance = CGFloat.infinity
-//                print("Touching at vert \(vertex.point).. \(vertex.touchingHallways.count)")
             }
             
             fromVertex.distance = 0
@@ -276,8 +208,6 @@ struct ContentView: View {
                         if totalDistance < endVertex.distance {
                             endVertex.distance = totalDistance
                         }
-                    } else {
-                        print("Visited already")
                     }
                 }
             }
@@ -304,9 +234,10 @@ struct ContentView: View {
    
 }
 
+// MARK: - Helper functions
 func CGPointDistanceSquared(from: CGPoint, to: CGPoint) -> CGFloat {
-    let unsquareDistance = (from.x - to.x) * (from.x - to.x) + (from.y - to.y) * (from.y - to.y)
-    return sqrt(unsquareDistance)
+    let notSquaredDistance = (from.x - to.x) * (from.x - to.x) + (from.y - to.y) * (from.y - to.y)
+    return sqrt(notSquaredDistance)
 }
 
 func CGPointIsOnLine(lineStart: CGPoint, lineEnd: CGPoint, pointToCheck: CGPoint) -> Bool {
@@ -314,7 +245,7 @@ func CGPointIsOnLine(lineStart: CGPoint, lineEnd: CGPoint, pointToCheck: CGPoint
     let yAreSame = pointToCheck.y == lineStart.y && pointToCheck.y == lineEnd.y
     
     if xAreSame {
-        /// ignore direction
+        /// compare Y coordinates now
         let maxY = max(lineStart.y, lineEnd.y)
         let minY = min(lineStart.y, lineEnd.y)
         
@@ -324,11 +255,9 @@ func CGPointIsOnLine(lineStart: CGPoint, lineEnd: CGPoint, pointToCheck: CGPoint
             return true
         }
     } else if yAreSame {
-        /// ignore direction
+        /// compare X coordinates now
         let maxX = max(lineStart.x, lineEnd.x)
         let minX = min(lineStart.x, lineEnd.x)
-        
-        print("Y Same. Comparing Y bounds: min \(minX) point \(pointToCheck.x) max \(maxX)")
         
         if pointToCheck.x <= maxX && pointToCheck.x >= minX {
             return true
@@ -338,10 +267,60 @@ func CGPointIsOnLine(lineStart: CGPoint, lineEnd: CGPoint, pointToCheck: CGPoint
     return false
 }
 
+// MARK: - Structures
+class DirectionalHallway {
+    var start: CGPoint
+    var end: CGPoint
+    let weight: CGFloat
+    
+    init(start: CGPoint, end: CGPoint, weight: CGFloat? = nil) {
+        self.start = start
+        self.end = end
+        
+        if let weight = weight { /// if weight is provided, then set
+            self.weight = weight
+        } else { /// calculate weight if not provided
+            self.weight = CGPointDistanceSquared(from: start, to: end)
+        }
+    }
+}
+
+class Vertex: Equatable {
+    var point: CGPoint
+    var distance = CGFloat.infinity
+    var touchingHallways = [DirectionalHallway]()
+    var visited = false
+    
+    init(point: CGPoint) {
+        self.point = point
+    }
+    
+    static func == (lhs: Vertex, rhs: Vertex) -> Bool {
+        return lhs === rhs
+    }
+    
+}
+
+struct Classroom: Identifiable, Hashable {
+    let id = UUID()
+    
+    var name: String
+    var entrancePoints: [CGPoint]
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+    static func ==(lhs: Classroom, rhs: Classroom) -> Bool {
+        return lhs.id == rhs.id
+    }
+}
+
+// MARK: - Testing
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
     }
 }
+
 
 
