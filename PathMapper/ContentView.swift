@@ -62,7 +62,10 @@ struct ContentView: View {
     ]
     
     // MARK: - User input storage
-    @State var selectedClassroom = Classroom(name: "Select a classroom", entrancePoints: [])
+    @State var selectedClassroom = Classroom(name: "Tap here!", entrancePoints: [])
+    
+    // MARK: - Output
+    @State var distance = CGFloat(0)
     
     // MARK: - User interface
     var body: some View {
@@ -78,8 +81,6 @@ struct ContentView: View {
             
             
             ZStack {
-                Color(.secondarySystemBackground)
-                    .frame(width: 400, height: 400)
                 
                 Image("Hallways")
                     .resizable()
@@ -89,22 +90,59 @@ struct ContentView: View {
                 
                 MapView()
             }
-            .padding(.vertical, 10)
+            .padding(.vertical, 20)
+            .background(
+                    Color(.secondarySystemBackground)
+            )
             
             VStack {
-                Picker(selectedClassroom.name, selection: $selectedClassroom) {
-                    ForEach(classrooms, id: \.self) { classroom in
-                        Text(classroom.name)
+                
+                HStack {
+                    Text("Select a classroom")
+                    
+                    Spacer()
+                    
+                    Picker(selectedClassroom.name, selection: $selectedClassroom) {
+                        ForEach(classrooms, id: \.self) { classroom in
+                            Text(classroom.name)
+                        }
+                    }
+                    .pickerStyle(MenuPickerStyle())
+                    .foregroundColor(.blue)
+                    
+                }
+                .font(.system(size: 20))
+                .padding()
+                .background(Color(.secondarySystemBackground))
+                .cornerRadius(16)
+                .padding(EdgeInsets(top: 6, leading: 20, bottom: 6, trailing: 20))
+                
+                Group {
+                    if distance != 0 {
+                        HStack {
+                            Text("Result:")
+                                .fontWeight(.bold)
+                            
+                            Spacer()
+                            
+                            Text("\(distance.toFeet()) feet (~\(distance.toFormattedMinutes()) min)")
+                            
+                        }
+                        .font(.system(size: 20))
+                        .padding()
+                        .background(Color(.secondarySystemBackground))
+                        .cornerRadius(16)
+                        .padding(EdgeInsets(top: 0, leading: 20, bottom: 6, trailing: 20))
                     }
                 }
-                .pickerStyle(MenuPickerStyle())
-                .font(.system(size: 24, weight: .medium))
-                .foregroundColor(.blue)
-                .padding(.vertical, 6)
-                
+                .transition(.scale)
                 
                 Button(action: {
-                    calculateShortestPathTo(classroom: selectedClassroom)
+                    if let distance = calculateShortestPathTo(classroom: selectedClassroom) {
+                        withAnimation {
+                            self.distance = distance
+                        }
+                    }
                 }) {
                     Text("Calculate")
                         .font(.system(size: 21, weight: .medium))
@@ -115,11 +153,18 @@ struct ContentView: View {
                 }
             }
             
+            Spacer()
+            
         }
+        .onChange(of: selectedClassroom, perform: { newValue in
+            withAnimation {
+                self.distance = 0 /// hide results if Classroom changed
+            }
+        })
     }
     
     // MARK: - Functions
-    func calculateShortestPathTo(classroom: Classroom) {
+    func calculateShortestPathTo(classroom: Classroom) -> CGFloat? {
         print("classroom: \(classroom)")
         
         /// create an empty Vertex array
@@ -217,6 +262,8 @@ struct ContentView: View {
         
         
         let totalDistance = distance(from: youAreHere.point, to: classroom.entrancePoints.first!)
+        
+        return totalDistance
         print("---- DIST ----- \(totalDistance)")
         
         
@@ -265,6 +312,25 @@ func CGPointIsOnLine(lineStart: CGPoint, lineEnd: CGPoint, pointToCheck: CGPoint
     }
     
     return false
+}
+
+extension CGFloat {
+    func toFeet() -> Int {
+        let feetConversionFactor = CGFloat(1) / CGFloat(2) /// 1 pixel = half feet
+        let feet = self * feetConversionFactor
+        let feetRounded = Int(feet) /// round to nearest integer
+        
+        return feetRounded
+    }
+    
+    func toFormattedMinutes() -> String {
+        let minuteConversionFactor = CGFloat(1) / CGFloat(276) /// average walking speed is 276 feet per minute
+        let minutes = self * minuteConversionFactor
+        let minutesFormatted = String(format: "%.2f", minutes) /// format with 1 decimal place
+        
+        return minutesFormatted
+    }
+    
 }
 
 // MARK: - Structures
