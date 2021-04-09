@@ -8,18 +8,14 @@
 
 /* Begin PBXBuildFile section */
 		3CF45F22260E4DA100FE949E /* PathMapperApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CF45F21260E4DA100FE949E /* PathMapperApp.swift */; };
-		3CF45F24260E4DA100FE949E /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CF45F23260E4DA100FE949E /* ContentView.swift */; };
 		3CF45F26260E4DA200FE949E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3CF45F25260E4DA200FE949E /* Assets.xcassets */; };
-		3CF45F34260E6AFE00FE949E /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CF45F33260E6AFE00FE949E /* MapView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		3CF45F1E260E4DA100FE949E /* PathMapper.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PathMapper.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3CF45F21260E4DA100FE949E /* PathMapperApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PathMapperApp.swift; sourceTree = "<group>"; };
-		3CF45F23260E4DA100FE949E /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		3CF45F25260E4DA200FE949E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		3CF45F2A260E4DA200FE949E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		3CF45F33260E6AFE00FE949E /* MapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -53,8 +49,6 @@
 			isa = PBXGroup;
 			children = (
 				3CF45F21260E4DA100FE949E /* PathMapperApp.swift */,
-				3CF45F23260E4DA100FE949E /* ContentView.swift */,
-				3CF45F33260E6AFE00FE949E /* MapView.swift */,
 				3CF45F25260E4DA200FE949E /* Assets.xcassets */,
 				3CF45F2A260E4DA200FE949E /* Info.plist */,
 			);
@@ -129,8 +123,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3CF45F24260E4DA100FE949E /* ContentView.swift in Sources */,
-				3CF45F34260E6AFE00FE949E /* MapView.swift in Sources */,
 				3CF45F22260E4DA100FE949E /* PathMapperApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
