@@ -66,6 +66,8 @@ struct ContentView: View {
     
     // MARK: - Output
     @State var distance = CGFloat(0)
+    @State var points = [CGPoint]()
+    @State var pathDrawnPercentage = CGFloat(0)
     
     // MARK: - User interface
     var body: some View {
@@ -88,11 +90,26 @@ struct ContentView: View {
                     .frame(width: 400, height: 400)
                 
                 
-                MapView()
+                Path { path in
+                    
+                    if !points.isEmpty {
+                        
+                        path.move(to: points.first!)
+                        
+                        for point in points {
+                            path.addLine(to: point)
+                        }
+                        
+                    }
+                }
+                .trim(from: 0, to: pathDrawnPercentage)
+                .stroke(Color.blue, lineWidth: 4)
+                .shadow(color: Color.black.opacity(0.3), radius: 3, x: 0.0, y: 0.0)
+                .frame(width: 400, height: 400)
             }
             .padding(.vertical, 20)
             .background(
-                    Color(.secondarySystemBackground)
+                Color(.secondarySystemBackground)
             )
             
             VStack {
@@ -138,10 +155,15 @@ struct ContentView: View {
                 .transition(.scale)
                 
                 Button(action: {
-                    if let distance = calculateShortestPathTo(classroom: selectedClassroom) {
+                    if let (distance, vertices) = calculateShortestPathTo(classroom: selectedClassroom) {
+                        self.points = vertices.map { $0.point }
                         withAnimation {
                             self.distance = distance
                         }
+                        withAnimation(.easeOut(duration: 1.5)) {
+                            self.pathDrawnPercentage = 1
+                        }
+                        
                     }
                 }) {
                     Text("Calculate")
@@ -159,12 +181,13 @@ struct ContentView: View {
         .onChange(of: selectedClassroom, perform: { newValue in
             withAnimation {
                 self.distance = 0 /// hide results if Classroom changed
+                self.pathDrawnPercentage = 0
             }
         })
     }
     
     // MARK: - Functions
-    func calculateShortestPathTo(classroom: Classroom) -> CGFloat? {
+    func calculateShortestPathTo(classroom: Classroom) -> (CGFloat, [Vertex])? {
         print("classroom: \(classroom)")
         
         /// create an empty Vertex array
@@ -202,7 +225,8 @@ struct ContentView: View {
         }
         
         
-        func distance(from: CGPoint, to: CGPoint) -> CGFloat? {
+        /// return the distance and the path of vertices
+        func distance(from: CGPoint, to: CGPoint) -> (CGFloat, [Vertex])? {
             
             guard let fromVertex = vertices.first(where: { $0.point == from }) else {
                 return nil
@@ -222,17 +246,33 @@ struct ContentView: View {
             while !verticesToVisit.isEmpty {
                 print("---- current vertices to visit: \(verticesToVisit.map {$0.point })")
                 
-                // Select node with smallest distance.
+                /// out of verticesToVisit, use vertex with smallest distance
                 let currentVisitingVertex = verticesToVisit.min(by: { (a, b) -> Bool in
                     return a.distance < b.distance
                 })!
                 
                 print("Current point \(currentVisitingVertex.point)")
                 
-                // Destination reached?
-                if currentVisitingVertex == toVertex { return currentVisitingVertex.distance }
+                /// if equal to end, done
+                if currentVisitingVertex == toVertex {
+                    
+                    
+                    var previousVertices = [currentVisitingVertex]
+                    func getPreviousVertex(currentVertex: Vertex) {
+                        if let previousHallway = currentVertex.previousHallway {
+                            let previousVertex = vertexAt(point: previousHallway.start)
+                            previousVertices.insert(previousVertex, at: 0) /// insert previous vertex at beginning
+                            getPreviousVertex(currentVertex: previousVertex)
+                        }
+                    }
+                    
+                    getPreviousVertex(currentVertex: currentVisitingVertex)
+                    print("Prev: \(previousVertices)")
+                    return (currentVisitingVertex.distance, previousVertices)
+                    
+                }
                 
-                // Mark as visited.
+                /// set current vertex to visited
                 currentVisitingVertex.visited = true
                 
                 
@@ -240,7 +280,7 @@ struct ContentView: View {
                     verticesToVisit.remove(at: firstIndex)
                 }
                 
-                // Update unvisited neighbors.
+                /// calculate distances of touching hallways
                 for touchingHallway in currentVisitingVertex.touchingHallways {
                     print("Touching end: \(touchingHallway.end)")
                     let endVertex = vertexAt(point: touchingHallway.end)
@@ -252,29 +292,35 @@ struct ContentView: View {
                         let totalDistance = currentVisitingVertex.distance + touchingHallway.weight
                         if totalDistance < endVertex.distance {
                             endVertex.distance = totalDistance
+                            endVertex.previousHallway = touchingHallway
                         }
                     }
                 }
             }
             
+            /// if none found, fall back to return nil
             return nil
         }
+        
+        
         
         
         let totalDistance = distance(from: youAreHere.point, to: classroom.entrancePoints.first!)
         
         return totalDistance
-        print("---- DIST ----- \(totalDistance)")
         
         
-        if classroom.name == "GYM" || classroom.name == "CAF" {
-            print("Spacial")
-        } else if let number = Int(classroom.name) {
-            print("number.. \(number)")
-        } else {
-            print("Nope")
-        }
-        print("!    done")
+//        print("---- DIST ----- \(totalDistance)")
+//
+//
+//        if classroom.name == "GYM" || classroom.name == "CAF" {
+//            print("Spacial")
+//        } else if let number = Int(classroom.name) {
+//            print("number.. \(number)")
+//        } else {
+//            print("Nope")
+//        }
+//        print("!    done")
     }
     
     
@@ -355,7 +401,9 @@ class Vertex: Equatable {
     var point: CGPoint
     var distance = CGFloat.infinity
     var touchingHallways = [DirectionalHallway]()
+    
     var visited = false
+    var previousHallway: DirectionalHallway?
     
     init(point: CGPoint) {
         self.point = point

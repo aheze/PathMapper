@@ -8,12 +8,27 @@
 import SwiftUI
 
 struct MapView: View {
-
+    @State var points = [CGPoint]()
+    
     var body: some View {
-        ZStack {
-            EmptyView()
+        Path { path in
+            
+            if !points.isEmpty {
+                print("po \(points)_")
+                
+                path.move(to: points.first!)
+                
+                for point in points {
+                    path.addLine(to: point)
+                }
+                
+            }
         }
         .frame(width: 400, height: 400)
+    }
+    
+    func drawWith(vertices: [Vertex]) {
+        self.points = vertices.map { $0.point }
     }
 }
 
