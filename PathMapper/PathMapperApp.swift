@@ -35,7 +35,7 @@ struct MainView: View {
     ]
     
     let classrooms: [Classroom] = [
-        Classroom(name: "GYM", entrancePoints: [CGPoint(x: 70, y: 190), CGPoint(x: 225, y: 240), CGPoint(x: 225, y: 300)]),
+        Classroom(name: "PAC", entrancePoints: [CGPoint(x: 70, y: 190), CGPoint(x: 225, y: 240), CGPoint(x: 225, y: 300)]),
         Classroom(name: "CAF", entrancePoints: [CGPoint(x: 225, y: 270), CGPoint(x: 270, y: 230)]),
         Classroom(name: "101", entrancePoints: [CGPoint(x: 90, y: 350)]),
         Classroom(name: "102", entrancePoints: [CGPoint(x: 140, y: 350)]),
@@ -222,9 +222,8 @@ struct MainView: View {
     }
     
     func calculateShortestPathTo(classroom: Classroom) -> (CGFloat, [Vertex])? {
-        print("classroom: \(classroom)")
         
-        /// return the distance and the path of vertices
+        /// Reusable function to calculate the distance and path
         func distance(verticesToCheck: [Vertex], from: Vertex, to: Vertex) -> (CGFloat, [Vertex])? {
             
             for vertex in verticesToCheck {
@@ -261,7 +260,6 @@ struct MainView: View {
                 /// set current vertex to visited
                 currentVisitingVertex.visited = true
                 
-                
                 if let firstIndex = verticesToVisit.firstIndex(of: currentVisitingVertex) {
                     verticesToVisit.remove(at: firstIndex)
                 }
@@ -285,7 +283,8 @@ struct MainView: View {
             return nil
         }
         
-        if classroom.name == "GYM" || classroom.name == "CAF" {
+        /// test `classroom` and execute different blocks of code
+        if classroom.name == "PAC" || classroom.name == "CAF" { /// classroom is the PAC or CAF
             var currentShortestDistance = CGFloat.infinity
             var currentShortestPath = [Vertex]()
             
@@ -304,7 +303,7 @@ struct MainView: View {
             }
             
             return (currentShortestDistance, currentShortestPath)
-        } else if Int(classroom.name) != nil {
+        } else if Int(classroom.name) != nil { /// classroom name is made of numbers (normal classroom)
             let vertices = getVerticesTo(destinationPoint: classroom.entrancePoints.first!)
             
             guard let fromVertex = vertices.first(where: { $0.point == youAreHerePoint }) else { return nil }
@@ -312,10 +311,14 @@ struct MainView: View {
             let totalDistance = distance(verticesToCheck: vertices, from: fromVertex, to: toVertex)
             
             return totalDistance
+        } else { /// no classroom was selected
+            
+            let alert = UIAlertController(title: "Select a classroom", message: "You must select a classroom first", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
+            UIApplication.shared.keyWindow?.rootViewController?.present(alert, animated: true) /// present the alert
+            
+            return nil /// return nil (no shortest path was calculated)
         }
-        
-        return nil /// return nil if failed
-        
     }
 }
 
@@ -333,8 +336,6 @@ func CGPointIsOnLine(lineStart: CGPoint, lineEnd: CGPoint, pointToCheck: CGPoint
         /// compare Y coordinates now
         let maxY = max(lineStart.y, lineEnd.y)
         let minY = min(lineStart.y, lineEnd.y)
-        
-        print("X Same. Comparing Y bounds: min \(minY) point \(pointToCheck.x) max \(maxY)")
         
         if pointToCheck.y <= maxY && pointToCheck.y >= minY {
             return true
