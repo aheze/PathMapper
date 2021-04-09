@@ -196,9 +196,9 @@ struct MainView: View {
             
             let fullHallway = hallways[destinationHallwayIndex]
             let segmentHallway = DirectionalHallway(start: fullHallway.start, end: destinationPoint)
-            let endHallway = DirectionalHallway(start: destinationPoint, end: .zero, weight: 0)
+            let endHallway = DirectionalHallway(start: destinationPoint, end: .zero, weight: 0) /// create a new hallway with starting point at the destination
             
-            hallways[destinationHallwayIndex] = segmentHallway /// replace the full hallway with the segmentedHallway
+            hallways[destinationHallwayIndex] = segmentHallway /// replace the full hallway with the segmented hallway
             hallways.append(endHallway)
         }
         
@@ -232,8 +232,8 @@ struct MainView: View {
                     currentShortestPath = path
                 }
             }
-            
             return (currentShortestDistance, currentShortestPath)
+            
         } else if Int(classroom.name) != nil { /// classroom name is made of numbers (normal classroom)
             let vertices = getVerticesTo(destinationPoint: classroom.entrancePoints.first!)
             
@@ -243,6 +243,7 @@ struct MainView: View {
             if let (shortestDistance, path) = shortestDistanceAndPath(verticesToCheck: vertices, from: fromVertex, to: toVertex) {
                 return (shortestDistance, path)
             }
+            
         } else { /// no classroom was selected
             
             let alert = UIAlertController(title: "Select a classroom", message: "You must select a classroom first", preferredStyle: .alert)
@@ -250,7 +251,7 @@ struct MainView: View {
             UIApplication.shared.keyWindow?.rootViewController?.present(alert, animated: true) /// present error alert
         }
         
-        return nil /// return nil (no shortest path was calculated)
+        return nil /// return nil when IF check fell through without returning - no shortest path was calculated
     }
     
     /// reusable function to calculate the distance and path
@@ -262,7 +263,7 @@ struct MainView: View {
         
         while verticesToVisit.isEmpty == false {
             
-            /// out of verticesToVisit, use vertex with smallest distance
+            /// inside verticesToVisit, use vertex with smallest distance
             let currentVisitingVertex = verticesToVisit.min(by: { (a, b) in return a.distance < b.distance })!
             
             if currentVisitingVertex == to { /// if equal to end, done
@@ -325,7 +326,7 @@ func PointIsOnLine(lineStart: CGPoint, lineEnd: CGPoint, pointToCheck: CGPoint) 
         }
     }
     
-    return false
+    return false /// if not on the line
 }
 
 func NumberToFeet(number: CGFloat) -> Int {
@@ -346,8 +347,8 @@ func NumberToFormattedMinutes(number: CGFloat) -> String {
 
 // MARK: - Structures
 class DirectionalHallway {
-    var start: CGPoint
-    var end: CGPoint
+    let start: CGPoint
+    let end: CGPoint
     let weight: CGFloat
     
     init(start: CGPoint, end: CGPoint, weight: CGFloat? = nil) {
@@ -363,7 +364,7 @@ class DirectionalHallway {
 }
 
 class Vertex: Equatable {
-    var point: CGPoint
+    let point: CGPoint
     var distance = CGFloat.infinity
     var touchingHallways = [DirectionalHallway]()
     
