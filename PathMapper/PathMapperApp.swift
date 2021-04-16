@@ -193,22 +193,24 @@ struct MainView: View {
         var foundDestinationHallway = false
         
         for i in hallways.indices {
-            if
+            if /// check if the hallway contains the destination classroom, if not yet found
                 foundDestinationHallway == false && PointIsOnLine(
                     lineStart: hallways[i].start,
                     lineEnd: hallways[i].end,
                     pointToCheck: destinationPoint) == true
             {
                 let segmentHallway = DirectionalHallway(start: hallways[i].start, end: destinationPoint)
-                hallways[i] = segmentHallway /// replace the full hallway with the segmented hallway
+                hallways[i] = segmentHallway /// replace the full hallway with a portion of the hallway
                 
-                let endHallway = DirectionalHallway(start: destinationPoint, end: .zero, weight: 0)
+                /// add a hallway that starts at the destination classroom
+                let endHallway = DirectionalHallway(start: destinationPoint, end: .zero, length: 0)
                 let vertex = vertexAt(point: endHallway.start)
                 vertex.touchingHallways.append(endHallway)
                 
-                foundDestinationHallway = true
+                foundDestinationHallway = true /// set found to true, so it doesn't check again
             }
             
+            /// get the vertex at the hallway's start, and append the hallway to the vertex's neighbors
             let vertex = vertexAt(point: hallways[i].start)
             vertex.touchingHallways.append(hallways[i])
         }
@@ -293,7 +295,7 @@ struct MainView: View {
                 let endVertex = verticesToCheck.first(where: { $0.point == touchingHallway.end })!
                 if endVertex.visited == false {
                     verticesToVisit.append(endVertex)
-                    let totalDistance = currentVisitingVertex.distance + touchingHallway.weight
+                    let totalDistance = currentVisitingVertex.distance + touchingHallway.length
                     if totalDistance < endVertex.distance { endVertex.distance = totalDistance; endVertex.previousHallway = touchingHallway}
                 }
             }
@@ -355,16 +357,16 @@ func NumberToFormattedMinutes(number: CGFloat) -> String {
 class DirectionalHallway {
     let start: CGPoint
     let end: CGPoint
-    let weight: CGFloat
+    let length: CGFloat
     
-    init(start: CGPoint, end: CGPoint, weight: CGFloat? = nil) {
+    init(start: CGPoint, end: CGPoint, length: CGFloat? = nil) {
         self.start = start
         self.end = end
         
-        if let weight = weight { /// if weight is provided, then set
-            self.weight = weight
-        } else { /// calculate weight if not provided
-            self.weight = DistanceFormula(from: start, to: end)
+        if let length = length { /// if length is provided, then set
+            self.length = length
+        } else { /// calculate length if not provided
+            self.length = DistanceFormula(from: start, to: end)
         }
     }
 }
@@ -409,5 +411,15 @@ struct PathMapperApp: App {
         WindowGroup {
             MainView() /// make the `MainView` here
         }
+    }
+}
+
+
+public struct Ssdasd: View {
+    @State var asdasd = false
+    public init() {}
+    
+    public var body: some View {
+        Text("")
     }
 }
