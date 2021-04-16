@@ -8,7 +8,7 @@ struct MainView: View {
     // MARK: - Static information
     var youAreHerePoint = CGPoint(x: 225, y: 350)
     
-    /// array of hallways
+    /// list of hallways
     let hallways: [DirectionalHallway] = [
         
         /// horizontal hallways
@@ -31,7 +31,7 @@ struct MainView: View {
         DirectionalHallway(start: CGPoint(x: 370, y: 190), end: CGPoint(x: 370, y: 350))
     ]
     
-    /// array of classrooms
+    /// list of classrooms
     let classrooms: [Classroom] = [
         Classroom(name: "PAC", entrancePoints: [CGPoint(x: 70, y: 190), CGPoint(x: 225, y: 240), CGPoint(x: 225, y: 300)]),
         Classroom(name: "CAF", entrancePoints: [CGPoint(x: 225, y: 270), CGPoint(x: 270, y: 230)]),
@@ -173,12 +173,12 @@ struct MainView: View {
     
     // MARK: - Functions
     
-    /// create vertices based off the `hallways` array
+    /// create vertices based off the `hallways` list
     func getVerticesTo(destinationPoint: CGPoint) -> [Vertex] {
         
         var vertices = [Vertex]() /// will later contain the vertices of the map
         
-        /// get the vertex at a point from the `vertices` array. Appends if does not contain
+        /// get the vertex at a point from the `vertices` list. Appends if does not contain
         func vertexAt(point: CGPoint) -> Vertex {
             if let vertex = vertices.first(where: { $0.point == point }) {
                 return vertex
@@ -190,27 +190,33 @@ struct MainView: View {
         }
         
         var hallways = self.hallways /// create a copy of the `hallways` list
+        var foundDestinationHallway = false
         
-        /// get the index of the hallway that contains `destinationPoint`
-        if let destinationHallwayIndex = hallways.firstIndex(where: { PointIsOnLine(lineStart: $0.start, lineEnd: $0.end, pointToCheck: destinationPoint) }) {
+        for i in hallways.indices {
+            if
+                foundDestinationHallway == false && PointIsOnLine(
+                    lineStart: hallways[i].start,
+                    lineEnd: hallways[i].end,
+                    pointToCheck: destinationPoint) == true
+            {
+                let segmentHallway = DirectionalHallway(start: hallways[i].start, end: destinationPoint)
+                hallways[i] = segmentHallway /// replace the full hallway with the segmented hallway
+                
+                let endHallway = DirectionalHallway(start: destinationPoint, end: .zero, weight: 0)
+                let vertex = vertexAt(point: endHallway.start)
+                vertex.touchingHallways.append(endHallway)
+                
+                foundDestinationHallway = true
+            }
             
-            let fullHallway = hallways[destinationHallwayIndex]
-            let segmentHallway = DirectionalHallway(start: fullHallway.start, end: destinationPoint)
-            let endHallway = DirectionalHallway(start: destinationPoint, end: .zero, weight: 0) /// create a new hallway with starting point at the destination
-            
-            hallways[destinationHallwayIndex] = segmentHallway /// replace the full hallway with the segmented hallway
-            hallways.append(endHallway)
-        }
-        
-        for hallway in hallways {
-            let vertex = vertexAt(point: hallway.start)
-            vertex.touchingHallways.append(hallway)
+            let vertex = vertexAt(point: hallways[i].start)
+            vertex.touchingHallways.append(hallways[i])
         }
         
         return vertices
     }
     
-    /// main function, returns distance and array of vertices
+    /// main function, returns distance and list of vertices
     func calculateShortestPathTo(classroom: Classroom) -> (CGFloat, [Vertex])? {
         
         /// test `classroom` and execute different blocks of code
