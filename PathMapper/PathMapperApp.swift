@@ -410,13 +410,3 @@ struct PathMapperApp: App {
         }
     }
 }
-
-
-public struct Ssdasd: View {
-    @State var asdasd = false
-    public init() {}
-    
-    public var body: some View {
-        Text("")
-    }
-}
