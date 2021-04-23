@@ -143,13 +143,10 @@ struct MainView: View {
                     
                     /// call the function
                     if let (distance, vertices) = calculateShortestPathTo(classroom: selectedClassroom) {
+                        
                         self.points = vertices.map { $0.point }
-                        withAnimation {
-                            self.distance = distance
-                        }
-                        withAnimation(.easeOut(duration: 1.5)) {
-                            self.pathDrawnPercentage = 1
-                        }
+                        withAnimation { self.distance = distance }
+                        withAnimation(.easeOut(duration: 1.5)) { self.pathDrawnPercentage = 1 }
                     }
                 }) {
                     Text("Calculate")
@@ -259,7 +256,7 @@ struct MainView: View {
             UIApplication.shared.keyWindow?.rootViewController?.present(alert, animated: true) /// present error alert
         }
         
-        return nil /// return nil when IF check fell through without returning - no shortest path was calculated
+        return nil /// return nil when IF check fell through without returning - no shortest path was found
     }
     
     /// reusable function to calculate the distance and path
