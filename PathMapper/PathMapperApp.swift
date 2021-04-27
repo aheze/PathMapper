@@ -6,7 +6,7 @@ import SwiftUI
 struct MainView: View {
     
     // MARK: - Static Information
-    var youAreHerePoint = CGPoint(x: 225, y: 350)
+    let youAreHerePoint = CGPoint(x: 225, y: 350)
     
     ///### 3B i. (Row 2) - list of hallways
     let hallways = [
@@ -31,7 +31,7 @@ struct MainView: View {
         DirectionalHallway(start: CGPoint(x: 370, y: 190), end: CGPoint(x: 370, y: 350))
     ]
     
-    /// list of classrooms
+    /// also, list of classrooms
     let classrooms = [
         Classroom(name: "PAC", entrancePoints: [CGPoint(x: 70, y: 190), CGPoint(x: 225, y: 240), CGPoint(x: 225, y: 300)]),
         Classroom(name: "CAF", entrancePoints: [CGPoint(x: 225, y: 270), CGPoint(x: 270, y: 230)]),
@@ -80,13 +80,12 @@ struct MainView: View {
                 .padding(EdgeInsets(top: 0, leading: 12, bottom: 6, trailing: 12))
             
             ZStack {
-                Image("Map")
+                Image("Map") /// the map image
                     .resizable()
-                    .aspectRatio(contentMode: .fill)
                 
-                // MARK: - Visual Output - line drawn on top of map
+                // MARK: - Visual Output, path drawn on top of map
                 Path { path in
-                    if !mapPathVertices.isEmpty {
+                    if mapPathVertices.isEmpty == false {
                         path.move(to: mapPathVertices.first!.point)
                         for vertex in mapPathVertices {
                             path.addLine(to: vertex.point)
@@ -121,7 +120,7 @@ struct MainView: View {
                 .cornerRadius(16)
                 .padding(EdgeInsets(top: 6, leading: 20, bottom: 6, trailing: 20))
                 
-                // MARK: - Text Output - showing the distance and approximate duration
+                // MARK: - Text Output, show the distance and approximate duration
                 Group {
                     if resultDistance != 0 {
                         HStack {
@@ -161,12 +160,14 @@ struct MainView: View {
             
             Spacer()
         }
-        .onChange(of: selectedClassroom, perform: { newValue in /// observe changes of the selected classroom
+        /// remove results if selected classroom changed
+        .onChange(of: selectedClassroom) { _ in
             withAnimation {
-                resultDistance = 0 /// remove results if selected classroom changed
+                resultDistance = 0
+                mapPathVertices.removeAll()
                 mapPathDrawnPercentage = 0
             }
-        })
+        }
     }
     
     // MARK: - Procedures
@@ -175,7 +176,7 @@ struct MainView: View {
     func getVerticesTo(destinationPoint: CGPoint) -> [Vertex] {
         var vertices = [Vertex]() /// will later contain the vertices of the map
         
-        /// get the vertex at a point from the `vertices` list. Appends if does not contain
+        /// get the vertex at a point from the `vertices` list, append if does not contain
         func vertexAt(point: CGPoint) -> Vertex {
             if let vertex = vertices.first(where: { $0.point == point }) {
                 return vertex
@@ -259,7 +260,7 @@ struct MainView: View {
             UIApplication.shared.keyWindow?.rootViewController?.present(alert, animated: true) /// present error alert
         }
         
-        return nil /// return nil when IF check fell through without returning - no shortest path was found
+        return nil /// return nothing when if check fell through - no shortest path was found
     }
     
 }
@@ -278,7 +279,7 @@ func PointIsOnLine(lineStart: CGPoint, lineEnd: CGPoint, pointToCheck: CGPoint) 
     let yAreSame = pointToCheck.y == lineStart.y && pointToCheck.y == lineEnd.y
     
     if xAreSame {
-        /// compare Y coordinates now
+        /// compare Y coordinates
         let maxY = max(lineStart.y, lineEnd.y)
         let minY = min(lineStart.y, lineEnd.y)
         
@@ -286,7 +287,7 @@ func PointIsOnLine(lineStart: CGPoint, lineEnd: CGPoint, pointToCheck: CGPoint) 
             return true
         }
     } else if yAreSame {
-        /// compare X coordinates now
+        /// compare X coordinates
         let maxX = max(lineStart.x, lineEnd.x)
         let minX = min(lineStart.x, lineEnd.x)
         
@@ -303,8 +304,8 @@ func PointIsOnLine(lineStart: CGPoint, lineEnd: CGPoint, pointToCheck: CGPoint) 
 func ShortestDistanceAndPath(verticesToCheck: [Vertex], from: Vertex, to: Vertex) -> (CGFloat, [Vertex])? {
     
     for vertex in verticesToCheck { vertex.visited = false; vertex.distance = CGFloat.infinity }
-    from.distance = 0 /// set the first vertex's distance to 0
     var verticesToVisit: [Vertex] = [from]
+    from.distance = 0 /// set the first vertex's distance to 0
     
     while verticesToVisit.isEmpty == false {
         
@@ -338,7 +339,7 @@ func ShortestDistanceAndPath(verticesToCheck: [Vertex], from: Vertex, to: Vertex
         }
     }
     
-    /// if none found, fall back to return nil
+    /// if none found, fall back to return nothing
     return nil
 }
 
