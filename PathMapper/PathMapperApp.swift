@@ -201,17 +201,15 @@ struct MainView: View {
                 let segmentHallway = DirectionalHallway(start: hallwaysCopy[i].start, end: destinationPoint)
                 hallwaysCopy[i] = segmentHallway /// replace the full hallway with a portion of the hallway
                 
-                /// add a hallway that starts at the destination classroom
                 let endHallway = DirectionalHallway(start: destinationPoint, end: .zero, length: 0)
-                let vertex = vertexAt(point: endHallway.start)
-                vertex.touchingHallways.append(endHallway)
+                let vertex = vertexAt(point: endHallway.start) /// get the vertex at the hallway's start
+                vertex.touchingHallways.append(endHallway) /// append the hallway to the vertex's neighbors
                 
                 foundDestinationHallway = true /// set found to true, so it doesn't check again
             }
             
-            /// get the vertex at the hallway's start, and append the hallway to the vertex's neighbors
-            let vertex = vertexAt(point: hallwaysCopy[i].start)
-            vertex.touchingHallways.append(hallwaysCopy[i])
+            let vertex = vertexAt(point: hallwaysCopy[i].start) /// get the vertex at the hallway's start
+            vertex.touchingHallways.append(hallwaysCopy[i]) /// append the hallway to the vertex's neighbors
         }
         
         return vertices
@@ -257,7 +255,7 @@ struct MainView: View {
         } else { /// no classroom was selected
             let alert = UIAlertController(title: "Select a classroom", message: "You must select a classroom first", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
-            UIApplication.shared.keyWindow?.rootViewController?.present(alert, animated: true) /// present error alert
+            UIApplication.shared.windows.first{$0.isKeyWindow}?.rootViewController?.present(alert, animated: true) /// present error alert
         }
         
         return nil /// return nothing when if check fell through - no shortest path was found
