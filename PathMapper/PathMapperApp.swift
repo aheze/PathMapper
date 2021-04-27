@@ -8,7 +8,7 @@ struct MainView: View {
     // MARK: - Static Information
     var youAreHerePoint = CGPoint(x: 225, y: 350)
     
-    /// list of hallways
+    ///### 3B i. (Row 2) - list of hallways
     let hallways = [
         
         /// horizontal hallways
@@ -127,7 +127,7 @@ struct MainView: View {
                         HStack {
                             Text("Result:").fontWeight(.bold)
                             Spacer()
-                            Text("\(NumberToFeet(number: resultDistance)) feet (~\(NumberToFormattedMinutes(number: resultDistance)) min)") /// Concatenate strings
+                            Text("\(NumberToFeet(number: resultDistance)) feet (~\(NumberToMinutes(number: resultDistance)) min)") /// Concatenate strings
                         }
                         .font(.system(size: 20))
                         .padding()
@@ -141,7 +141,7 @@ struct MainView: View {
                 /// tap button to call main procedure
                 Button(action: {
                     
-                    /// call the procedure
+                    ///### 3C ii. (Row 4) - call the procedure
                     if let (distance, vertices) = calculateShortestPathTo(classroom: selectedClassroom) {
                         withAnimation {
                             mapPathVertices = vertices
@@ -171,9 +171,8 @@ struct MainView: View {
     
     // MARK: - Procedures
     
-    /// create vertices based off the `hallways` list
+    /// get vertices of all possible routes to a destination
     func getVerticesTo(destinationPoint: CGPoint) -> [Vertex] {
-        
         var vertices = [Vertex]() /// will later contain the vertices of the map
         
         /// get the vertex at a point from the `vertices` list. Appends if does not contain
@@ -187,6 +186,7 @@ struct MainView: View {
             }
         }
         
+        ///### 3B ii. (Row 3) - create vertices from the `hallways` list
         var hallwaysCopy = hallways /// create a copy of the `hallways` list
         var foundDestinationHallway = false
         
@@ -216,42 +216,44 @@ struct MainView: View {
         return vertices
     }
     
-    /// main procedure, returns distance and list of vertices
+    ///### 3C i. (Row 4) - main procedure, get a classroom's distance and list of vertices
     func calculateShortestPathTo(classroom: Classroom) -> (CGFloat, [Vertex])? {
         
-        /// test `classroom` and execute different blocks of code
+        /// **selection**
+        /// test `classroom` to run different blocks of code
         if classroom.name == "PAC" || classroom.name == "CAF" { /// classroom is the PAC or CAF
             var currentShortestDistance = CGFloat.infinity
             var currentShortestPath = [Vertex]()
             
+            /// **iteration**
             for entrancePoint in classroom.entrancePoints {
                 let vertices = getVerticesTo(destinationPoint: entrancePoint)
                 
-                guard let fromVertex = vertices.first(where: { $0.point == youAreHerePoint }) else { break } /// exit loop if no vertex found
-                guard let toVertex = vertices.first(where: { $0.point == entrancePoint }) else { break }
-                
                 if
-                    let (shortestDistance, path) = shortestDistanceAndPath(verticesToCheck: vertices, from: fromVertex, to: toVertex),
+                    let fromVertex = vertices.first(where: { $0.point == youAreHerePoint }),
+                    let toVertex = vertices.first(where: { $0.point == entrancePoint }),
+                    let (shortestDistance, shortestPath) = ShortestDistanceAndPath(verticesToCheck: vertices, from: fromVertex, to: toVertex),
                     shortestDistance < currentShortestDistance
                 {
                     currentShortestDistance = shortestDistance
-                    currentShortestPath = path
+                    currentShortestPath = shortestPath
                 }
             }
             return (currentShortestDistance, currentShortestPath)
             
         } else if Int(classroom.name) != nil { /// classroom name is made of numbers (normal classroom)
+            /// **sequencing**
             let vertices = getVerticesTo(destinationPoint: classroom.entrancePoints.first!)
             
-            guard let fromVertex = vertices.first(where: { $0.point == youAreHerePoint }) else { return nil }
-            guard let toVertex = vertices.first(where: { $0.point == classroom.entrancePoints.first! }) else { return nil }
-            
-            if let (shortestDistance, path) = shortestDistanceAndPath(verticesToCheck: vertices, from: fromVertex, to: toVertex) {
-                return (shortestDistance, path)
+            if
+                let fromVertex = vertices.first(where: { $0.point == youAreHerePoint }),
+                let toVertex = vertices.first(where: { $0.point == classroom.entrancePoints.first! }),
+                let (shortestDistance, shortestPath) = ShortestDistanceAndPath(verticesToCheck: vertices, from: fromVertex, to: toVertex)
+            {
+                return (shortestDistance, shortestPath)
             }
             
         } else { /// no classroom was selected
-            
             let alert = UIAlertController(title: "Select a classroom", message: "You must select a classroom first", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
             UIApplication.shared.keyWindow?.rootViewController?.present(alert, animated: true) /// present error alert
@@ -260,56 +262,17 @@ struct MainView: View {
         return nil /// return nil when IF check fell through without returning - no shortest path was found
     }
     
-    /// reusable procedure to calculate the distance and path
-    func shortestDistanceAndPath(verticesToCheck: [Vertex], from: Vertex, to: Vertex) -> (CGFloat, [Vertex])? {
-        
-        for vertex in verticesToCheck { vertex.visited = false; vertex.distance = CGFloat.infinity }
-        from.distance = 0 /// set the first vertex's distance to 0
-        var verticesToVisit: [Vertex] = [from]
-        
-        while verticesToVisit.isEmpty == false {
-            
-            /// inside verticesToVisit, use vertex with smallest distance
-            let currentVisitingVertex = verticesToVisit.min(by: { (a, b) in return a.distance < b.distance })!
-            
-            if currentVisitingVertex == to { /// if equal to end, done
-                var previousVertices = [currentVisitingVertex]
-                
-                func getPreviousVertex(currentVertex: Vertex) { /// recursive procedure to trace path backwards
-                    if let previousHallway = currentVertex.previousHallway {
-                        let previousVertex = verticesToCheck.first(where: { $0.point == previousHallway.start })!
-                        previousVertices.insert(previousVertex, at: 0) /// insert previous vertex at beginning
-                        getPreviousVertex(currentVertex: previousVertex)
-                    }
-                }
-                getPreviousVertex(currentVertex: currentVisitingVertex)
-                return (currentVisitingVertex.distance, previousVertices) /// exit the `while` loop
-            }
-            
-            /// set current vertex to visited
-            currentVisitingVertex.visited = true
-            if let firstIndex = verticesToVisit.firstIndex(of: currentVisitingVertex) { verticesToVisit.remove(at: firstIndex) }
-            for touchingHallway in currentVisitingVertex.touchingHallways { /// calculate distances of touching hallways
-                let endVertex = verticesToCheck.first(where: { $0.point == touchingHallway.end })!
-                if endVertex.visited == false {
-                    verticesToVisit.append(endVertex)
-                    let totalDistance = currentVisitingVertex.distance + touchingHallway.length
-                    if totalDistance < endVertex.distance { endVertex.distance = totalDistance; endVertex.previousHallway = touchingHallway}
-                }
-            }
-        }
-        
-        /// if none found, fall back to return nil
-        return nil
-    }
 }
 
-// MARK: - Helper procedures
+// MARK: - Helper Procedures
+
+/// the distance formula
 func DistanceFormula(from: CGPoint, to: CGPoint) -> CGFloat {
     let notSquaredDistance = (from.x - to.x) * (from.x - to.x) + (from.y - to.y) * (from.y - to.y)
     return sqrt(notSquaredDistance)
 }
 
+/// check if a point falls on the line between 2 points
 func PointIsOnLine(lineStart: CGPoint, lineEnd: CGPoint, pointToCheck: CGPoint) -> Bool {
     let xAreSame = pointToCheck.x == lineStart.x && pointToCheck.x == lineEnd.x
     let yAreSame = pointToCheck.y == lineStart.y && pointToCheck.y == lineEnd.y
@@ -332,17 +295,63 @@ func PointIsOnLine(lineStart: CGPoint, lineEnd: CGPoint, pointToCheck: CGPoint) 
         }
     }
     
-    return false /// if not on the line
+    return false /// not on the line
 }
 
-func NumberToFeet(number: CGFloat) -> Int {
+/// reusable procedure to calculate the distance and path
+/// adapted from https://codereview.stackexchange.com/a/212585 (CC BY-SA 4.0)
+func ShortestDistanceAndPath(verticesToCheck: [Vertex], from: Vertex, to: Vertex) -> (CGFloat, [Vertex])? {
+    
+    for vertex in verticesToCheck { vertex.visited = false; vertex.distance = CGFloat.infinity }
+    from.distance = 0 /// set the first vertex's distance to 0
+    var verticesToVisit: [Vertex] = [from]
+    
+    while verticesToVisit.isEmpty == false {
+        
+        /// inside verticesToVisit, use vertex with smallest distance
+        let currentVisitingVertex = verticesToVisit.min(by: { (a, b) in return a.distance < b.distance })!
+        
+        if currentVisitingVertex == to { /// if equal to end, done
+            var previousVertices = [currentVisitingVertex]
+            
+            func getPreviousVertex(currentVertex: Vertex) { /// recursive procedure to trace path backwards
+                if let previousHallway = currentVertex.previousHallway {
+                    let previousVertex = verticesToCheck.first(where: { $0.point == previousHallway.start })!
+                    previousVertices.insert(previousVertex, at: 0) /// insert previous vertex at beginning
+                    getPreviousVertex(currentVertex: previousVertex)
+                }
+            }
+            getPreviousVertex(currentVertex: currentVisitingVertex)
+            return (currentVisitingVertex.distance, previousVertices) /// exit the `while` loop
+        }
+        
+        /// set current vertex to visited
+        currentVisitingVertex.visited = true
+        if let firstIndex = verticesToVisit.firstIndex(of: currentVisitingVertex) { verticesToVisit.remove(at: firstIndex) }
+        for touchingHallway in currentVisitingVertex.touchingHallways { /// calculate distances of touching hallways
+            let endVertex = verticesToCheck.first(where: { $0.point == touchingHallway.end })!
+            if endVertex.visited == false {
+                verticesToVisit.append(endVertex)
+                let totalDistance = currentVisitingVertex.distance + touchingHallway.length
+                if totalDistance < endVertex.distance { endVertex.distance = totalDistance; endVertex.previousHallway = touchingHallway}
+            }
+        }
+    }
+    
+    /// if none found, fall back to return nil
+    return nil
+}
+
+/// convert on-screen distance to feet
+func NumberToFeet(number: CGFloat) -> String {
     let feetConversionFactor = CGFloat(1) / CGFloat(2) /// 1 pixel = half feet
     let feet = number * feetConversionFactor
     let feetRounded = Int(feet) /// round to nearest integer
     
-    return feetRounded
+    return "\(feetRounded)"
 }
-func NumberToFormattedMinutes(number: CGFloat) -> String {
+/// convert on-screen distance to average walking duration
+func NumberToMinutes(number: CGFloat) -> String {
     let minuteConversionFactor = CGFloat(1) / CGFloat(276) /// average walking speed is 276 feet per minute
     let minutes = number * minuteConversionFactor
     let minutesFormatted = String(format: "%.2f", minutes) /// format with 1 decimal place
@@ -402,12 +411,12 @@ struct Classroom: Identifiable, Hashable {
 }
 
 
-// MARK: - Run the code
+// MARK: - Run The Code
 @main
 struct PathMapperApp: App {
     var body: some Scene {
         WindowGroup {
-            MainView() /// make the `MainView` here
+            MainView() /// run the `MainView` here
         }
     }
 }
