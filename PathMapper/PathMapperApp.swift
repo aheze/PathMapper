@@ -73,11 +73,12 @@ struct MainView: View {
             
             Text("PathMapper")
                 .font(.system(size: 32, weight: .bold, design: .rounded))
-                .padding(EdgeInsets(top: 12, leading: 12, bottom: 3, trailing: 12))
+                .padding(.horizontal, 12)
             
-            Text("Find the shortest route to a classroom")
+            Text("Find the shortest route to a classroom, but follow the directional arrows!")
                 .fontWeight(.medium)
-                .padding(EdgeInsets(top: 0, leading: 12, bottom: 6, trailing: 12))
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 12)
             
             ZStack {
                 Image("Map") /// the map image
@@ -117,7 +118,7 @@ struct MainView: View {
                 .padding()
                 .background(Color(.secondarySystemBackground))
                 .cornerRadius(16)
-                .padding(EdgeInsets(top: 6, leading: 20, bottom: 6, trailing: 20))
+                .padding(.horizontal, 20)
                 
                 // MARK: - Text Output, show the distance and approximate time needed
                 Group {
@@ -131,7 +132,7 @@ struct MainView: View {
                         .padding()
                         .background(Color(.secondarySystemBackground))
                         .cornerRadius(16)
-                        .padding(EdgeInsets(top: 0, leading: 20, bottom: 6, trailing: 20))
+                        .padding(.horizontal, 20)
                     }
                 }
                 .transition(.scale) /// transition animation
