@@ -174,23 +174,24 @@ struct MainView: View {
     
     /// get vertices of all possible paths to a destination
     func getVerticesTo(destinationPoint: CGPoint) -> [Vertex] {
-        var vertices = [Vertex]() /// will later contain the vertices of the map
         
-        /// get the vertex at a point from the `vertices` list, append if does not contain
+        ///### 3B ii. (Row 3) - create new vertices from the `hallways` list
+        var vertices = [Vertex]() /// vertices for the shortest-path algorithm
         func vertexAt(point: CGPoint) -> Vertex {
             if let vertex = vertices.first(where: { $0.point == point }) {
-                return vertex
+                return vertex /// return existing vertex in the `vertices` list
             } else {
                 let vertex = Vertex(point: point)
                 vertices.append(vertex)
-                return vertex
+                return vertex /// return a new vertex and append to the `vertices` list
             }
         }
         
-        ///### 3B ii. (Row 3) - create new vertices from the `hallways` list
-        var hallwaysCopy = hallways /// first copy the list
+        // MARK: First create a copy of the `hallways` list
+        var hallwaysCopy = hallways
         var foundDestinationHallway = false
         
+        // MARK: Create vertices from hallways (new data from existing data)
         for i in hallwaysCopy.indices {
             if /// check if the hallway contains the destination classroom
                 foundDestinationHallway == false && PointIsOnLine(
@@ -201,6 +202,7 @@ struct MainView: View {
                 let segmentHallway = DirectionalHallway(start: hallwaysCopy[i].start, end: destinationPoint)
                 hallwaysCopy[i] = segmentHallway /// replace the full hallway with a portion of the hallway
                 
+                /// append hallway that starts at the destination classroom's entrance
                 let endHallway = DirectionalHallway(start: destinationPoint, end: .zero, length: 0)
                 let vertex = vertexAt(point: endHallway.start) /// get the vertex at the hallway's start
                 vertex.touchingHallways.append(endHallway) /// append the hallway to the vertex's neighbors
