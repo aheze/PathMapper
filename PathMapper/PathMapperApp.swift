@@ -94,7 +94,7 @@ struct MainView: View {
                     }
                 }
                 .trim(from: 0, to: mapPathDrawnPercentage) /// animate path drawing
-                .stroke(Color.blue, style: .init(lineWidth: 6, lineCap: .round))
+                .stroke(Color.blue, style: StrokeStyle(lineWidth: 6, lineCap: .round))
                 .shadow(color: Color.black.opacity(0.3), radius: 3, x: 0.0, y: 0.0)
             }
             .frame(width: 400, height: 400)
