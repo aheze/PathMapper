@@ -1,11 +1,11 @@
-///  AP CREATE Task
-///  PathMapper
+///  AP Computer Science Principles - CREATE Task
+///  PathMapper - Find the shortest route to a classroom, but follow the directional arrows!
 
 import SwiftUI
 
 struct MainView: View {
     
-    // MARK: - Static Information
+    // MARK: - Static Variables
     let youAreHerePoint = CGPoint(x: 225, y: 350)
     
     ///### 3B i. (Row 2) - list of hallways
@@ -175,7 +175,7 @@ struct MainView: View {
     /// get vertices of all possible paths to a destination
     func getVerticesTo(destinationPoint: CGPoint) -> [Vertex] {
         
-        ///### 3B ii. (Row 3) - create new vertices from the `hallways` list
+        ///### 3B ii. (Row 3) - create `vertices` list from `hallways` list
         var vertices = [Vertex]() /// vertices for the shortest-path algorithm
         func vertexAt(point: CGPoint) -> Vertex {
             if let vertex = vertices.first(where: { $0.point == point }) {
@@ -191,7 +191,7 @@ struct MainView: View {
         var hallwaysCopy = hallways
         var foundDestinationHallway = false
         
-        // MARK: Create vertices from hallways (new data from existing data)
+        // MARK: Generate vertices from hallways (new data from existing data)
         for i in hallwaysCopy.indices {
             if /// check if the hallway contains the destination classroom
                 foundDestinationHallway == false && PointIsOnLine(
@@ -355,7 +355,7 @@ func NumberToMinutes(number: CGFloat) -> String {
     return minutesFormatted
 }
 
-// MARK: - Structures
+// MARK: - Custom Types
 class Vertex: Equatable {
     let point: CGPoint
     var distance = CGFloat.infinity
@@ -364,10 +364,10 @@ class Vertex: Equatable {
     var visited = false
     var previousHallway: DirectionalHallway?
     
-    init(point: CGPoint) { self.point = point}
+    init(point: CGPoint) { self.point = point }
     static func == (lhs: Vertex, rhs: Vertex) -> Bool { return lhs === rhs }
 }
-class DirectionalHallway {
+struct DirectionalHallway {
     let start: CGPoint
     let end: CGPoint
     let length: CGFloat
