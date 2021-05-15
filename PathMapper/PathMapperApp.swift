@@ -172,46 +172,34 @@ struct MainView: View {
     
     // MARK: - Procedures
     
-    /// get vertices of all possible paths to a destination
+    /// get list of vertices (represents all possible paths) to a destination
     func getVerticesTo(destinationPoint: CGPoint) -> [Vertex] {
         
         ///### 3B ii. (Row 3) - create `vertices` list from `hallways` list
-        var vertices = [Vertex]() /// vertices for the shortest-path algorithm
-        func vertexAt(point: CGPoint) -> Vertex {
-            if let vertex = vertices.first(where: { $0.point == point }) {
-                return vertex /// return existing vertex in the `vertices` list
+        var vertices = [Vertex]()
+        
+        /// append a hallway to the corresponding vertex's `touchingHallways`
+        func configureVertexWith(hallway: DirectionalHallway) {
+            var vertex: Vertex
+            if let existingVertex = vertices.first(where: { $0.point == hallway.start }) {
+                vertex = existingVertex /// prevent duplicates, return existing vertex in the `vertices` list
             } else {
-                let vertex = Vertex(point: point)
+                vertex = Vertex(point: hallway.start) /// create new vertex
                 vertices.append(vertex)
-                return vertex /// return a new vertex and append to the `vertices` list
             }
+            vertex.touchingHallways.append(hallway)
         }
         
-        // MARK: First create a copy of the `hallways` list
         var hallwaysCopy = hallways
-        var foundDestinationHallway = false
-        
-        // MARK: Generate vertices from hallways (new data from existing data)
         for i in hallwaysCopy.indices {
-            if /// check if the hallway contains the destination classroom
-                foundDestinationHallway == false && PointIsOnLine(
-                    lineStart: hallwaysCopy[i].start,
-                    lineEnd: hallwaysCopy[i].end,
-                    pointToCheck: destinationPoint) == true
-            {
+            if PointIsOnLine(lineStart: hallwaysCopy[i].start, lineEnd: hallwaysCopy[i].end, point: destinationPoint) {
                 let segmentHallway = DirectionalHallway(start: hallwaysCopy[i].start, end: destinationPoint)
                 hallwaysCopy[i] = segmentHallway /// replace the full hallway with a portion of the hallway
                 
-                /// append hallway that starts at the destination classroom's entrance
-                let endHallway = DirectionalHallway(start: destinationPoint, end: .zero, length: 0)
-                let vertex = vertexAt(point: endHallway.start) /// get the vertex at the hallway's start
-                vertex.touchingHallways.append(endHallway) /// append the hallway to the vertex's neighbors
-                
-                foundDestinationHallway = true /// set found to true, so it doesn't check again
+                let endHallway = DirectionalHallway(start: destinationPoint, end: destinationPoint) /// final hallway, length of 0
+                configureVertexWith(hallway: endHallway)
             }
-            
-            let vertex = vertexAt(point: hallwaysCopy[i].start) /// get the vertex at the hallway's start
-            vertex.touchingHallways.append(hallwaysCopy[i]) /// append the hallway to the vertex's neighbors
+            configureVertexWith(hallway: hallwaysCopy[i])
         }
         
         return vertices
@@ -274,20 +262,20 @@ func DistanceFormula(from: CGPoint, to: CGPoint) -> CGFloat {
 }
 
 /// check if a point falls on the line between 2 points
-func PointIsOnLine(lineStart: CGPoint, lineEnd: CGPoint, pointToCheck: CGPoint) -> Bool {
-    let xAreSame = pointToCheck.x == lineStart.x && pointToCheck.x == lineEnd.x
-    let yAreSame = pointToCheck.y == lineStart.y && pointToCheck.y == lineEnd.y
+func PointIsOnLine(lineStart: CGPoint, lineEnd: CGPoint, point: CGPoint) -> Bool {
+    let xAreSame = point.x == lineStart.x && point.x == lineEnd.x
+    let yAreSame = point.y == lineStart.y && point.y == lineEnd.y
     
     if xAreSame {
         let maxY = max(lineStart.y, lineEnd.y)
         let minY = min(lineStart.y, lineEnd.y)
-        if pointToCheck.y <= maxY && pointToCheck.y >= minY { /// compare Y coordinates
+        if point.y <= maxY && point.y >= minY { /// compare Y coordinates
             return true
         }
     } else if yAreSame {
         let maxX = max(lineStart.x, lineEnd.x)
         let minX = min(lineStart.x, lineEnd.x)
-        if pointToCheck.x <= maxX && pointToCheck.x >= minX { /// compare X coordinates
+        if point.x <= maxX && point.x >= minX { /// compare X coordinates
             return true
         }
     }
@@ -372,15 +360,10 @@ struct DirectionalHallway {
     let end: CGPoint
     let length: CGFloat
     
-    init(start: CGPoint, end: CGPoint, length: CGFloat? = nil) {
+    init(start: CGPoint, end: CGPoint) {
         self.start = start
         self.end = end
-        
-        if let length = length { /// if length is provided, then set
-            self.length = length
-        } else { /// calculate length if not provided
-            self.length = DistanceFormula(from: start, to: end)
-        }
+        self.length = DistanceFormula(from: start, to: end) /// calculate length
     }
 }
 struct Classroom: Identifiable, Hashable {
