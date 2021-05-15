@@ -185,7 +185,7 @@ struct MainView: View {
         var hallwaysCopy = hallways /// create mutable copy
         for i in hallwaysCopy.indices {
             if PointIsOnLine(lineStart: hallwaysCopy[i].start, lineEnd: hallwaysCopy[i].end, point: destinationPoint) {
-                hallwaysCopy[i] = DirectionalHallway(start: hallwaysCopy[i].start, end: destinationPoint) /// replace the full hallway with a portion of the hallway
+                hallwaysCopy[i] = DirectionalHallway(start: hallwaysCopy[i].start, end: destinationPoint) /// replace full hallway with a portion
                 configureVertexWith(hallway: DirectionalHallway(start: destinationPoint, end: destinationPoint)) /// final hallway, length of 0
             }
             configureVertexWith(hallway: hallwaysCopy[i])
