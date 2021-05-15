@@ -170,7 +170,7 @@ struct MainView: View {
         ///### 3B ii. (Row 3) - create `vertices` list from `hallways` list
         var vertices = [Vertex]()
         
-        /// append a hallway to the corresponding vertex's `touchingHallways`
+        /// get and append a hallway's corresponding vertex to `vertices`, then append the hallway to the vertex's `touchingHallways`
         func configureVertexWith(hallway: DirectionalHallway) {
             var vertex: Vertex
             if let existingVertex = vertices.first(where: { $0.point == hallway.start }) {
@@ -362,3 +362,12 @@ struct PathMapperApp: App {
         }
     }
 }
+
+func asdasd() {
+    let list = [1, 2, 3]
+    for i in 0..<list.count {
+        let number = list[i]
+        print(number)
+    }
+}
+
