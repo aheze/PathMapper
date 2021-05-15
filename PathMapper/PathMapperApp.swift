@@ -203,11 +203,8 @@ struct MainView: View {
             /// **iteration**
             for entrancePoint in classroom.entrancePoints {
                 let vertices = getVerticesTo(destinationPoint: entrancePoint)
-                
                 if
-                    let fromVertex = vertices.first(where: { $0.point == youAreHerePoint }),
-                    let toVertex = vertices.first(where: { $0.point == entrancePoint }),
-                    let shortestRoute = ShortestRouteFromVertices(vertices: vertices, start: fromVertex, end: toVertex),
+                    let shortestRoute = ShortestRouteFromVertices(vertices: vertices, start: youAreHerePoint, end: entrancePoint),
                     shortestRoute.distance < currentShortestRoute.distance
                 {
                     currentShortestRoute = shortestRoute
@@ -218,12 +215,7 @@ struct MainView: View {
         } else if Int(classroom.name) != nil { /// classroom name is made of numbers (normal classroom)
             /// **sequencing**
             let vertices = getVerticesTo(destinationPoint: classroom.entrancePoint)
-            
-            if
-                let fromVertex = vertices.first(where: { $0.point == youAreHerePoint }),
-                let toVertex = vertices.first(where: { $0.point == classroom.entrancePoint }),
-                let shortestRoute = ShortestRouteFromVertices(vertices: vertices, start: fromVertex, end: toVertex)
-            {
+            if let shortestRoute = ShortestRouteFromVertices(vertices: vertices, start: youAreHerePoint, end: classroom.entrancePoint) {
                 return shortestRoute
             }
         } else { /// no classroom was selected
@@ -269,17 +261,21 @@ func PointIsOnLine(lineStart: CGPoint, lineEnd: CGPoint, point: CGPoint) -> Bool
 /// calculate the shortest route from a list of vertices
 /// adapted from https://codereview.stackexchange.com/a/212585 (CC BY-SA 4.0)
 /// reference: https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm (CC BY-SA 3.0)
-func ShortestRouteFromVertices(vertices: [Vertex], start: Vertex, end: Vertex) -> Route? {
+func ShortestRouteFromVertices(vertices: [Vertex], start: CGPoint, end: CGPoint) -> Route? {
+    
+    /// use built-in `first(where:)` procedure to get vertex at point
+    let startVertex = vertices.first(where: { $0.point == start })!
+    let endVertex = vertices.first(where: { $0.point == end })
     
     for vertex in vertices { vertex.visited = false; vertex.distance = CGFloat.infinity }
-    var verticesToVisit: [Vertex] = [start]
-    start.distance = 0 /// set the first vertex's distance to 0
+    var verticesToVisit: [Vertex] = [startVertex]
+    startVertex.distance = 0 /// set the first vertex's distance to 0
     
     while verticesToVisit.isEmpty == false {
         
         /// inside `verticesToVisit`, use vertex with smallest distance
         let currentVisitingVertex = verticesToVisit.min(by: { (a, b) in return a.distance < b.distance })!
-        if currentVisitingVertex == end { /// if vertex is at destination, done!
+        if currentVisitingVertex == endVertex { /// if vertex is at destination, done!
             var path = [currentVisitingVertex]
             func getPreviousVertex(currentVertex: Vertex) { /// recursive procedure to trace path backwards
                 if let previousHallway = currentVertex.previousHallway {
@@ -344,7 +340,7 @@ struct DirectionalHallway {
 struct Classroom: Identifiable, Hashable {
     var name: String
     var entrancePoints: [CGPoint] /// if PAC or CAF
-    var entrancePoint: CGPoint /// regular classroom
+    var entrancePoint: CGPoint /// normal classroom made of numbers (e.g. 403)
     
     init(name: String, entrancePoints: [CGPoint]) { self.name = name; self.entrancePoints = entrancePoints; self.entrancePoint = .zero } /// no need for `entrancePoint`
     init(name: String, entrancePoint: CGPoint) { self.name = name; self.entrancePoints = []; self.entrancePoint = entrancePoint } /// no need for `entrancePoints`
