@@ -1,11 +1,12 @@
-///  AP Computer Science Principles - CREATE Task
-///  PathMapper - Find the shortest route to a classroom, but follow the directional arrows!
+///  AP Computer Science Principles - CREATE Performance Task
+///  "PathMapper" - Find the shortest route to a classroom, but follow the directional arrows!
+///  Written in the Swift programming language. An iOS app.
 
 import SwiftUI
 
 struct MainView: View {
     
-    // MARK: - Static Variables
+    // MARK: - Constants
     let youAreHerePoint = CGPoint(x: 225, y: 350)
     
     ///### 3B i. (Row 2) - list of hallways
@@ -176,7 +177,7 @@ struct MainView: View {
                 vertex = existingVertex /// prevent duplicates, return existing vertex in the `vertices` list
             } else {
                 vertex = Vertex(point: hallway.start) /// create new vertex
-                vertices.append(vertex)
+                vertices.append(vertex) /// append to `vertices` list
             }
             vertex.touchingHallways.append(hallway)
         }
@@ -198,9 +199,7 @@ struct MainView: View {
         
         /// **selection** - test `classroom` to run different blocks of code
         if classroom.name == "PAC" || classroom.name == "CAF" { /// classroom is the PAC or CAF
-
             var currentShortestRoute = Route(distance: .infinity, path: [])
-            
             /// **iteration**
             for entrancePoint in classroom.entrancePoints {
                 let vertices = getVerticesTo(destinationPoint: entrancePoint)
@@ -214,8 +213,8 @@ struct MainView: View {
                     currentShortestRoute = shortestRoute
                 }
             }
-            return currentShortestRoute
             
+            return currentShortestRoute
         } else if Int(classroom.name) != nil { /// classroom name is made of numbers (normal classroom)
             /// **sequencing**
             let vertices = getVerticesTo(destinationPoint: classroom.entrancePoints.first!)
@@ -223,15 +222,14 @@ struct MainView: View {
             if
                 let fromVertex = vertices.first(where: { $0.point == youAreHerePoint }),
                 let toVertex = vertices.first(where: { $0.point == classroom.entrancePoints.first! }),
-                let route = ShortestRouteFromVertices(vertices: vertices, start: fromVertex, end: toVertex)
+                let shortestRoute = ShortestRouteFromVertices(vertices: vertices, start: fromVertex, end: toVertex)
             {
-                return route
+                return shortestRoute
             }
-            
         } else { /// no classroom was selected
             let alert = UIAlertController(title: "Select a classroom", message: "You must select a classroom first", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
-            UIApplication.shared.windows.first{$0.isKeyWindow}?.rootViewController?.present(alert, animated: true) /// present error alert
+            UIApplication.shared.windows.first{ $0.isKeyWindow }?.rootViewController?.present(alert, animated: true) /// present error alert
         }
         
         return nil /// return nothing when if check fell through - no shortest path was found
@@ -249,8 +247,8 @@ func DistanceFormula(from: CGPoint, to: CGPoint) -> CGFloat {
 
 /// check if a point falls on the line between 2 points
 func PointIsOnLine(lineStart: CGPoint, lineEnd: CGPoint, point: CGPoint) -> Bool {
-    let xAreSame = point.x == lineStart.x && point.x == lineEnd.x
-    let yAreSame = point.y == lineStart.y && point.y == lineEnd.y
+    let xAreSame = (point.x == lineStart.x && point.x == lineEnd.x)
+    let yAreSame = (point.y == lineStart.y && point.y == lineEnd.y)
     
     if xAreSame {
         let maxY = max(lineStart.y, lineEnd.y)
@@ -341,13 +339,7 @@ class Vertex: Equatable {
 struct DirectionalHallway {
     let start: CGPoint
     let end: CGPoint
-    let length: CGFloat
-    
-    init(start: CGPoint, end: CGPoint) {
-        self.start = start
-        self.end = end
-        self.length = DistanceFormula(from: start, to: end) /// calculate length
-    }
+    var length: CGFloat { DistanceFormula(from: start, to: end) } /// calculate length
 }
 struct Classroom: Identifiable, Hashable {
     var name: String
