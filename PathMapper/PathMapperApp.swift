@@ -210,7 +210,6 @@ struct MainView: View {
                     currentShortestRoute = shortestRoute
                 }
             }
-            
             return currentShortestRoute
         } else if Int(classroom.name) != nil { /// classroom name is made of numbers (normal classroom)
             /// **sequencing**
