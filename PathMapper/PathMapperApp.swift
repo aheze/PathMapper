@@ -36,28 +36,28 @@ struct MainView: View {
     let classrooms = [
         Classroom(name: "PAC", entrancePoints: [CGPoint(x: 70, y: 190), CGPoint(x: 225, y: 240), CGPoint(x: 225, y: 300)]),
         Classroom(name: "CAF", entrancePoints: [CGPoint(x: 225, y: 270), CGPoint(x: 270, y: 230)]),
-        Classroom(name: "101", entrancePoints: [CGPoint(x: 90, y: 350)]),
-        Classroom(name: "102", entrancePoints: [CGPoint(x: 140, y: 350)]),
-        Classroom(name: "103", entrancePoints: [CGPoint(x: 190, y: 350)]),
-        Classroom(name: "104", entrancePoints: [CGPoint(x: 290, y: 350)]),
-        Classroom(name: "105", entrancePoints: [CGPoint(x: 340, y: 350)]),
-        Classroom(name: "201", entrancePoints: [CGPoint(x: 90, y: 190)]),
-        Classroom(name: "202", entrancePoints: [CGPoint(x: 140, y: 190)]),
-        Classroom(name: "203", entrancePoints: [CGPoint(x: 190, y: 190)]),
-        Classroom(name: "204", entrancePoints: [CGPoint(x: 290, y: 190)]),
-        Classroom(name: "205", entrancePoints: [CGPoint(x: 340, y: 190)]),
-        Classroom(name: "301", entrancePoints: [CGPoint(x: 90, y: 120)]),
-        Classroom(name: "302", entrancePoints: [CGPoint(x: 140, y: 120)]),
-        Classroom(name: "303", entrancePoints: [CGPoint(x: 190, y: 120)]),
-        Classroom(name: "304", entrancePoints: [CGPoint(x: 240, y: 120)]),
-        Classroom(name: "305", entrancePoints: [CGPoint(x: 290, y: 120)]),
-        Classroom(name: "306", entrancePoints: [CGPoint(x: 340, y: 120)]),
-        Classroom(name: "401", entrancePoints: [CGPoint(x: 90, y: 50)]),
-        Classroom(name: "402", entrancePoints: [CGPoint(x: 140, y: 50)]),
-        Classroom(name: "403", entrancePoints: [CGPoint(x: 190, y: 50)]),
-        Classroom(name: "404", entrancePoints: [CGPoint(x: 240, y: 50)]),
-        Classroom(name: "405", entrancePoints: [CGPoint(x: 290, y: 50)]),
-        Classroom(name: "406", entrancePoints: [CGPoint(x: 340, y: 50)])
+        Classroom(name: "101", entrancePoint: CGPoint(x: 90, y: 350)),
+        Classroom(name: "102", entrancePoint: CGPoint(x: 140, y: 350)),
+        Classroom(name: "103", entrancePoint: CGPoint(x: 190, y: 350)),
+        Classroom(name: "104", entrancePoint: CGPoint(x: 290, y: 350)),
+        Classroom(name: "105", entrancePoint: CGPoint(x: 340, y: 350)),
+        Classroom(name: "201", entrancePoint: CGPoint(x: 90, y: 190)),
+        Classroom(name: "202", entrancePoint: CGPoint(x: 140, y: 190)),
+        Classroom(name: "203", entrancePoint: CGPoint(x: 190, y: 190)),
+        Classroom(name: "204", entrancePoint: CGPoint(x: 290, y: 190)),
+        Classroom(name: "205", entrancePoint: CGPoint(x: 340, y: 190)),
+        Classroom(name: "301", entrancePoint: CGPoint(x: 90, y: 120)),
+        Classroom(name: "302", entrancePoint: CGPoint(x: 140, y: 120)),
+        Classroom(name: "303", entrancePoint: CGPoint(x: 190, y: 120)),
+        Classroom(name: "304", entrancePoint: CGPoint(x: 240, y: 120)),
+        Classroom(name: "305", entrancePoint: CGPoint(x: 290, y: 120)),
+        Classroom(name: "306", entrancePoint: CGPoint(x: 340, y: 120)),
+        Classroom(name: "401", entrancePoint: CGPoint(x: 90, y: 50)),
+        Classroom(name: "402", entrancePoint: CGPoint(x: 140, y: 50)),
+        Classroom(name: "403", entrancePoint: CGPoint(x: 190, y: 50)),
+        Classroom(name: "404", entrancePoint: CGPoint(x: 240, y: 50)),
+        Classroom(name: "405", entrancePoint: CGPoint(x: 290, y: 50)),
+        Classroom(name: "406", entrancePoint: CGPoint(x: 340, y: 50))
     ]
     
     // MARK: - User Input Storage
@@ -217,11 +217,11 @@ struct MainView: View {
             return currentShortestRoute
         } else if Int(classroom.name) != nil { /// classroom name is made of numbers (normal classroom)
             /// **sequencing**
-            let vertices = getVerticesTo(destinationPoint: classroom.entrancePoints.first!)
+            let vertices = getVerticesTo(destinationPoint: classroom.entrancePoint)
             
             if
                 let fromVertex = vertices.first(where: { $0.point == youAreHerePoint }),
-                let toVertex = vertices.first(where: { $0.point == classroom.entrancePoints.first! }),
+                let toVertex = vertices.first(where: { $0.point == classroom.entrancePoint }),
                 let shortestRoute = ShortestRouteFromVertices(vertices: vertices, start: fromVertex, end: toVertex)
             {
                 return shortestRoute
@@ -343,7 +343,11 @@ struct DirectionalHallway {
 }
 struct Classroom: Identifiable, Hashable {
     var name: String
-    var entrancePoints: [CGPoint]
+    var entrancePoints: [CGPoint] /// if PAC or CAF
+    var entrancePoint: CGPoint /// regular classroom
+    
+    init(name: String, entrancePoints: [CGPoint]) { self.name = name; self.entrancePoints = entrancePoints; self.entrancePoint = .zero } /// no need for `entrancePoint`
+    init(name: String, entrancePoint: CGPoint) { self.name = name; self.entrancePoints = []; self.entrancePoint = entrancePoint } /// no need for `entrancePoints`
     
     let id = UUID() /// boilerplate protocol requirements
     func hash(into hasher: inout Hasher) { hasher.combine(id) }
