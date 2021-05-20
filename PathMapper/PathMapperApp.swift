@@ -361,12 +361,3 @@ struct PathMapperApp: App {
         }
     }
 }
-
-func asdasd() {
-    let list = [1, 2, 3]
-    for i in 0..<list.count {
-        let number = list[i]
-        print(number)
-    }
-}
-
