@@ -174,7 +174,7 @@ struct MainView: View {
         func configureVertexWith(hallway: DirectionalHallway) {
             var vertex: Vertex
             if let existingVertex = vertices.first(where: { $0.point == hallway.start }) {
-                vertex = existingVertex /// prevent duplicates, return existing vertex in the `vertices` list
+                vertex = existingVertex /// prevent duplicates, get existing vertex in the `vertices` list
             } else {
                 vertex = Vertex(point: hallway.start) /// create new vertex
                 vertices.append(vertex) /// append to `vertices` list
@@ -197,8 +197,8 @@ struct MainView: View {
     ///### 3C i. (Row 4) - main procedure, get shortest route (distance and path) to classroom
     func shortestRouteTo(classroom: Classroom) -> Route? {
         
-        /// **selection** - test `classroom` to run different blocks of code
-        if classroom.name == "PAC" || classroom.name == "CAF" { /// classroom is the PAC or CAF
+        /// **selection**
+        if classroom.name == "PAC" || classroom.name == "CAF" { /// classroom is either PAC or CAF
             var currentShortestRoute = Route(distance: .infinity, path: [])
             /// **iteration**
             for entrancePoint in classroom.entrancePoints {
