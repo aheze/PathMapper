@@ -167,7 +167,7 @@ struct MainView: View {
     /// get list of vertices (represents all possible paths) to a destination
     func getVerticesTo(destinationPoint: CGPoint) -> [Vertex] {
         
-        ///### 3B ii. (Row 3) - create `vertices` list from `hallways` list
+        ///### 3B ii. (Row 2) - create `vertices` list from `hallways` list
         var vertices = [Vertex]()
         
         /// get and append a hallway's corresponding vertex to `vertices`, then append the hallway to the vertex's `touchingHallways`
