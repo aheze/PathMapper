@@ -80,7 +80,7 @@ struct MainView: View {
                 .padding(.horizontal, 12)
             
             ZStack {
-                Image("Map").resizable() /// the map image
+                Image("Map").resizable() /// the map image (made by myself)
                     
                 // MARK: - Visual Output, path drawn on top of map
                 Path { path in
