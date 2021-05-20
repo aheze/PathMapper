@@ -319,7 +319,7 @@ func NumberToMinutes(number: CGFloat) -> String {
     return minutesFormatted
 }
 
-// MARK: - Custom Types
+// MARK: - Custom Data Types
 class Vertex: Equatable {
     let point: CGPoint
     var distance = CGFloat.infinity
