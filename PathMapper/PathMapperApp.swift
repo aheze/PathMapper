@@ -1,17 +1,21 @@
-///  AP Computer Science Principles - CREATE Performance Task
-///  "PathMapper" - Find the shortest route to a classroom, but follow the directional arrows!
-///  Written in the Swift programming language. An iOS app.
+//
+//  PathMapperApp.swift
+//  PathMapper - Find the shortest route to a classroom, but follow the directional arrows!
+//  Written in the Swift programming language. An iOS app.
+//
+//  Created by A. Zheng (github.com/aheze) on 5/12/22.
+//  Copyright © 2022 A. Zheng. All rights reserved.
+//
 
 import SwiftUI
 
-struct MainView: View {
-    
+struct ContentView: View {
     // MARK: - Constants
+
     let youAreHerePoint = CGPoint(x: 225, y: 350)
     
-    ///### 3B i. (Row 2) - list of hallways
+    /// ### 3B i. (Row 2) - list of hallways
     let hallways = [
-        
         /// horizontal hallways
         DirectionalHallway(start: CGPoint(x: 30, y: 50), end: CGPoint(x: 370, y: 50)),
         DirectionalHallway(start: CGPoint(x: 370, y: 120), end: CGPoint(x: 225, y: 120)),
@@ -61,17 +65,19 @@ struct MainView: View {
     ]
     
     // MARK: - User Input Storage
+
     @State var selectedClassroom = Classroom(name: "Tap here!", entrancePoints: [])
     
     // MARK: - Output Storage
+
     @State var resultDistance = CGFloat(0)
     @State var mapPathVertices = [Vertex]()
     @State var mapPathDrawnPercentage = CGFloat(0)
     
     // MARK: - User Interface
+
     var body: some View {
         VStack {
-            
             Text("PathMapper")
                 .font(.system(size: 32, weight: .bold, design: .rounded))
             
@@ -83,6 +89,7 @@ struct MainView: View {
                 Image("Map").resizable() /// the map image (made by myself)
                     
                 // MARK: - Visual Output, path drawn on top of map
+
                 Path { path in
                     if mapPathVertices.isEmpty == false {
                         path.move(to: mapPathVertices.first!.point)
@@ -105,6 +112,7 @@ struct MainView: View {
                     Spacer()
 
                     // MARK: - Text Input via dropdown
+
                     Picker(selectedClassroom.name, selection: $selectedClassroom) {
                         ForEach(classrooms, id: \.self) { classroom in
                             Text(classroom.name)
@@ -117,11 +125,12 @@ struct MainView: View {
                 .cornerRadius(16)
                 
                 // MARK: - Text Output, show the distance and approximate time needed
+
                 if resultDistance != 0 {
                     HStack {
                         Text("Result:").fontWeight(.bold)
                         Spacer()
-                        Text("\(NumberToFeet(number: resultDistance)) feet (~\(NumberToMinutes(number: resultDistance)) min)") /// Concatenate strings
+                        Text("\(numberToFeet(number: resultDistance)) feet (~\(numberToMinutes(number: resultDistance)) min)") /// Concatenate strings
                     }
                     .padding()
                     .background(Color(.secondarySystemBackground))
@@ -130,8 +139,7 @@ struct MainView: View {
                 
                 /// tap button to call main procedure
                 Button(action: {
-                    
-                    ///### 3C ii. (Row 4) - call the procedure
+                    /// ### 3C ii. (Row 4) - call the procedure
                     if let route = shortestRouteTo(classroom: selectedClassroom) {
                         withAnimation {
                             resultDistance = route.distance
@@ -166,8 +174,7 @@ struct MainView: View {
     
     /// get list of vertices (represents all possible paths) to a destination
     func getVerticesTo(destinationPoint: CGPoint) -> [Vertex] {
-        
-        ///### 3B ii. (Row 2) - create `vertices` list from `hallways` list
+        /// ### 3B ii. (Row 2) - create `vertices` list from `hallways` list
         var vertices = [Vertex]()
         
         /// get and append a hallway's corresponding vertex to `vertices`, then append the hallway to the vertex's `touchingHallways`
@@ -194,9 +201,8 @@ struct MainView: View {
         return vertices
     }
     
-    ///### 3C i. (Row 4) - main procedure, get shortest route (distance and path) to classroom
+    /// ### 3C i. (Row 4) - main procedure, get shortest route (distance and path) to classroom
     func shortestRouteTo(classroom: Classroom) -> Route? {
-        
         /// **selection**
         if classroom.name == "PAC" || classroom.name == "CAF" { /// classroom is either PAC or CAF
             var currentShortestRoute = Route(distance: .infinity, path: [])
@@ -220,12 +226,11 @@ struct MainView: View {
         } else { /// no classroom was selected
             let alert = UIAlertController(title: "Select a classroom", message: "You must select a classroom first", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
-            UIApplication.shared.windows.first{ $0.isKeyWindow }?.rootViewController?.present(alert, animated: true) /// present error alert
+            UIApplication.shared.windows.first { $0.isKeyWindow }?.rootViewController?.present(alert, animated: true) /// present error alert
         }
         
         return nil /// return nothing when if check fell through - no shortest path was found
     }
-    
 }
 
 // MARK: - Helper Procedures
@@ -244,13 +249,13 @@ func PointIsOnLine(lineStart: CGPoint, lineEnd: CGPoint, point: CGPoint) -> Bool
     if xAreSame {
         let maxY = max(lineStart.y, lineEnd.y)
         let minY = min(lineStart.y, lineEnd.y)
-        if point.y <= maxY && point.y >= minY { /// compare Y coordinates
+        if point.y <= maxY, point.y >= minY { /// compare Y coordinates
             return true
         }
     } else if yAreSame {
         let maxX = max(lineStart.x, lineEnd.x)
         let minX = min(lineStart.x, lineEnd.x)
-        if point.x <= maxX && point.x >= minX { /// compare X coordinates
+        if point.x <= maxX, point.x >= minX { /// compare X coordinates
             return true
         }
     }
@@ -261,7 +266,6 @@ func PointIsOnLine(lineStart: CGPoint, lineEnd: CGPoint, point: CGPoint) -> Bool
 /// adapted from https://codereview.stackexchange.com/a/212585 (CC BY-SA 4.0)
 /// reference: https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm (CC BY-SA 3.0)
 func ShortestRouteFromVertices(vertices: [Vertex], start: CGPoint, end: CGPoint) -> Route? {
-    
     /// use built-in `first(where:)` procedure to get vertex at point
     let startVertex = vertices.first(where: { $0.point == start })!
     let endVertex = vertices.first(where: { $0.point == end })
@@ -271,9 +275,8 @@ func ShortestRouteFromVertices(vertices: [Vertex], start: CGPoint, end: CGPoint)
     startVertex.distance = 0 /// set the first vertex's distance to 0
     
     while verticesToVisit.isEmpty == false {
-        
         /// inside `verticesToVisit`, use vertex with smallest distance
-        let currentVisitingVertex = verticesToVisit.min(by: { (a, b) in return a.distance < b.distance })!
+        let currentVisitingVertex = verticesToVisit.min(by: { a, b in a.distance < b.distance })!
         if currentVisitingVertex == endVertex { /// if vertex is at destination, done!
             var path = [currentVisitingVertex]
             func getPreviousVertex(currentVertex: Vertex) { /// recursive procedure to trace path backwards
@@ -296,7 +299,7 @@ func ShortestRouteFromVertices(vertices: [Vertex], start: CGPoint, end: CGPoint)
             if endVertex.visited == false {
                 verticesToVisit.append(endVertex)
                 let totalDistance = currentVisitingVertex.distance + touchingHallway.length
-                if totalDistance < endVertex.distance { endVertex.distance = totalDistance; endVertex.previousHallway = touchingHallway}
+                if totalDistance < endVertex.distance { endVertex.distance = totalDistance; endVertex.previousHallway = touchingHallway }
             }
         }
     }
@@ -305,14 +308,15 @@ func ShortestRouteFromVertices(vertices: [Vertex], start: CGPoint, end: CGPoint)
 }
 
 /// convert on-screen distance to feet
-func NumberToFeet(number: CGFloat) -> String {
+func numberToFeet(number: CGFloat) -> String {
     let feetConversionFactor = CGFloat(1) / CGFloat(2) /// 1 pixel = half feet
     let feet = number * feetConversionFactor
     let feetRounded = Int(feet) /// round to nearest integer
     return "\(feetRounded)"
 }
+
 /// convert on-screen distance to average walking duration
-func NumberToMinutes(number: CGFloat) -> String {
+func numberToMinutes(number: CGFloat) -> String {
     let minuteConversionFactor = CGFloat(1) / CGFloat(276) /// average walking speed is 276 feet per minute
     let minutes = number * minuteConversionFactor
     let minutesFormatted = String(format: "%.2f", minutes) /// format with 1 decimal place
@@ -320,6 +324,7 @@ func NumberToMinutes(number: CGFloat) -> String {
 }
 
 // MARK: - Custom Data Types
+
 class Vertex: Equatable {
     let point: CGPoint
     var distance = CGFloat.infinity
@@ -331,11 +336,13 @@ class Vertex: Equatable {
     init(point: CGPoint) { self.point = point }
     static func == (l: Vertex, r: Vertex) -> Bool { return l === r }
 }
+
 struct DirectionalHallway {
     let start: CGPoint
     let end: CGPoint
     var length: CGFloat { DistanceFormula(from: start, to: end) } /// calculate length
 }
+
 struct Classroom: Identifiable, Hashable {
     var name: String
     var entrancePoints: [CGPoint] /// if PAC or CAF
@@ -347,17 +354,19 @@ struct Classroom: Identifiable, Hashable {
     let id = UUID() /// boilerplate protocol requirements
     func hash(into hasher: inout Hasher) { hasher.combine(id) }
 }
+
 struct Route {
     var distance: CGFloat
     var path: [Vertex]
 }
 
 // MARK: - Run The Code
+
 @main
 struct PathMapperApp: App {
     var body: some Scene {
         WindowGroup {
-            MainView() /// run the `MainView` here
+            ContentView() /// run the `Content` here
         }
     }
 }
